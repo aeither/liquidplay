@@ -1,0 +1,20 @@
+{
+  "name": "move-agent-test",
+  "version": "1.0.0",
+  "description": "Testing Move Agent Kit",
+  "main": "index.ts",
+  "scripts": {
+    "start": "bun index.ts",
+    "dev": "bun --watch index.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "move-agent-kit": "^0.2.0",
+    "@aptos-labs/ts-sdk": "^1.10.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.5"
+  }
+}
