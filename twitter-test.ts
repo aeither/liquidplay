@@ -1,4 +1,4 @@
-import { Scraper, SearchMode } from 'agent-twitter-client';
+import { Scraper, SearchMode, Tweet } from 'agent-twitter-client';
 import dotenv from 'dotenv';
 dotenv.config();
 
