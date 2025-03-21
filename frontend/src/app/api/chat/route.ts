@@ -13,7 +13,6 @@ export async function POST(req: Request) {
     // forward system prompt and tools from the frontend
     system,
   });
-  console.log("🚀 ~ POST ~ result:", result)
 
   return result.toDataStreamResponse();
 }
