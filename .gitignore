@@ -1,8 +1,12 @@
 node_modules/
 dist/
+.mastra/
 .env
+.env.development
 .DS_Store
 *.log
+*.db
 coverage/
 .vscode/
 twitter-cookies.json
+output.txt
