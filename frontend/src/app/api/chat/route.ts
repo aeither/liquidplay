@@ -14,5 +14,5 @@ export async function POST(req: Request) {
     system,
   });
 
-  return result.toDataStreamResponse();
+  return result.toDataStreamResponse({ sendReasoning: false });
 }
