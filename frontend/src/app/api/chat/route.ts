@@ -1,8 +1,6 @@
 import { mastra } from "@/mastra";
 import { groq } from "@ai-sdk/groq";
-import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
-import { z } from "zod";
 
 export const runtime = 'nodejs'
 
@@ -49,7 +47,23 @@ export async function POST(req: Request) {
     Your response should ONLY be a single string containing the most appropriate agent type: "twitter", "move", "knowledge", or "game".
     Do not include any other text in your response.`,
   });
-  console.log(object);
+  console.log('plan: ', object);
+
+  if (object === 'move') {
+    const myAgent = mastra.getAgent('moveAgent');
+    const stream = await myAgent.stream(messages);
+    return stream.toDataStreamResponse({ sendReasoning: false });
+  }
+  // if (object === 'knowledge') {
+  //   const myAgent = mastra.getAgent('knowledgeAgent');
+  //   const stream = await myAgent.stream(messages);
+  //   return stream.toDataStreamResponse({ sendReasoning: false });
+  // }
+  if (object === 'twitter') {
+    const myAgent = mastra.getAgent('twitterAgent');
+    const stream = await myAgent.stream(messages);
+    return stream.toDataStreamResponse({ sendReasoning: false });
+  }
 
   const myAgent = mastra.getAgent('moveAgent');
   const stream = await myAgent.stream(messages);
