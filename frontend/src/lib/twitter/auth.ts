@@ -1,7 +1,14 @@
-import { Scraper } from 'agent-twitter-client';
+// Import Scraper type separately to avoid initialization problems
+import type { Scraper } from 'agent-twitter-client';
 import * as dotenv from 'dotenv';
 import type { Cookie } from 'tough-cookie';
 import { retrieveCookies, storeCookies } from '../r2/s3client';
+
+// Dynamically import the Scraper class to avoid initialization issues
+async function getScraperClass() {
+  const { Scraper } = await import('agent-twitter-client');
+  return Scraper;
+}
 
 dotenv.config();
 
@@ -26,7 +33,9 @@ export async function getScraper(options: {
     password = process.env.TWITTER_PASSWORD
   } = options;
 
-  const scraper = new Scraper();
+  // Dynamically import the Scraper to avoid circular dependencies
+  const ScraperClass = await getScraperClass();
+  const scraper = new ScraperClass();
 
   // Try to load cookies from R2
   try {

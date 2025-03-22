@@ -6,4 +6,5 @@ export { weatherTool } from './weatherTool';
 export * from './move';
 
 // Export Twitter tools
-export { accountTweetsTool, searchTwitterTool, protocolTweetsTool } from './twitterTool';
+export { accountTweetsTool, protocolTweetsTool, searchTwitterTool } from './twitter';
+

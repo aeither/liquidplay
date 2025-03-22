@@ -1,16 +1,17 @@
 import { groq } from '@ai-sdk/groq';
 import { Agent } from '@mastra/core/agent';
-import { 
-  balanceTool, 
-  borrowAriesTokensTool, 
-  createAriesProfileTool, 
+import {
   accountTweetsTool,
-  protocolTweetsTool, 
-  lendAriesTokensTool, 
+  balanceTool,
+  borrowAriesTokensTool,
+  createAriesProfileTool,
+  lendAriesTokensTool,
+  protocolTweetsTool,
   searchTwitterTool,
-  stakeAmnisTokensTool, 
-  withdrawAriesTokensTool 
+  stakeAmnisTokensTool,
+  withdrawAriesTokensTool
 } from '../tools';
+import { twitterAnalysisTool } from '../tools/twitter';
 
 export const moveAgent = new Agent({
   name: 'Move Agent',
@@ -36,17 +37,25 @@ export const moveAgent = new Agent({
       - accountTweetsTool: Get tweets from a specific Twitter account
       - searchTwitterTool: Search for tweets matching a query
       - protocolTweetsTool: Get relevant tweets for specific Aptos protocols
+      - twitterAnalysisTool: Analyze Twitter activity for blockchain protocols
 `,
   model: groq('qwen-qwq-32b'),
-  tools: { 
-    balanceTool, 
-    stakeAmnisTokensTool, 
-    createAriesProfileTool, 
-    lendAriesTokensTool, 
-    borrowAriesTokensTool, 
+  tools: {
+    balanceTool,
+    stakeAmnisTokensTool,
+    createAriesProfileTool,
+    lendAriesTokensTool,
+    borrowAriesTokensTool,
     withdrawAriesTokensTool,
     accountTweetsTool,
     searchTwitterTool,
-    protocolTweetsTool
+    protocolTweetsTool,
+    twitterAnalysisTool
   },
 });
+
+
+// Export all agents from this file
+export const agents = {
+  moveAgent,
+};
