@@ -13,44 +13,48 @@ import {
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 
 export default function MyApp() {
-	const runtime = useChatRuntime({
-		api: "/api/chat",
-		adapters: {
-			speech: new WebSpeechSynthesisAdapter(),
-			attachments: new CompositeAttachmentAdapter([
-				new SimpleImageAttachmentAdapter(),
-				new SimpleTextAttachmentAdapter(),
-			]),
-		},
-	});
+  const runtime = useChatRuntime({
+    api: "/api/chat",
+    adapters: {
+      speech: new WebSpeechSynthesisAdapter(),
+      attachments: new CompositeAttachmentAdapter([
+        new SimpleImageAttachmentAdapter(),
+        new SimpleTextAttachmentAdapter(),
+      ]),
+    },
+  });
 
-	return (
-		<AssistantRuntimeProvider runtime={runtime}>
-			<div className="h-dvh bg-black p-4 font-['Press_Start_2P',monospace] text-green-400 overflow-hidden border-4 border-green-500">
-				<div className="grid grid-cols-[250px_1fr] gap-x-4 h-full">
-					<div className="bg-gray-900 p-4 rounded-md border-2 border-green-500 shadow-[0_0_10px_#22c55e] overflow-y-auto">
-						<div className="mb-4 text-center border-b-2 border-green-500 pb-2">
-							<h2 className="text-md tracking-wider animate-pulse">
-								GAME MENU
-							</h2>
-						</div>
-						<ThreadList />
-					</div>
-					<div className="flex flex-col h-full">
-						<div className="bg-gray-900 p-4 rounded-md border-2 border-green-500 mb-4 flex-grow overflow-y-auto shadow-[0_0_10px_#22c55e]">
-							<div className="mb-4 text-center border-b-2 border-green-500 pb-2">
-								<h2 className="text-md tracking-wider">CONSOLE OUTPUT</h2>
-							</div>
-							<Thread />
-						</div>
-						<div className="bg-gray-900 p-3 rounded-md border-2 border-green-500 shadow-[0_0_10px_#22c55e]">
-							<WebSearchToolUI />
-						</div>
-					</div>
-				</div>
-			</div>
+  return (
+    <AssistantRuntimeProvider runtime={runtime}>
+      <div className="h-dvh bg-black p-4 font-['Press_Start_2P',monospace] text-green-400 overflow-hidden border-4 border-green-500">
+        <div className="grid grid-cols-[250px_1fr] gap-x-4 h-full">
+          <div className="bg-gray-900 p-4 rounded-md border-2 border-green-500 shadow-[0_0_10px_#22c55e] flex flex-col h-full">
+            <div className="mb-4 text-center border-b-2 border-green-500 pb-2 flex-shrink-0">
+              <h2 className="text-md tracking-wider animate-pulse">
+                GAME MENU
+              </h2>
+            </div>
+            <div className="overflow-y-auto flex-1 h-0 min-h-0 pr-2 custom-scrollbar">
+              <ThreadList />
+            </div>
+          </div>
+          <div className="flex flex-col h-full">
+            <div className="bg-gray-900 p-4 rounded-md border-2 border-green-500 mb-4 flex-grow flex flex-col shadow-[0_0_10px_#22c55e] h-0 min-h-0">
+              <div className="mb-4 text-center border-b-2 border-green-500 pb-2 flex-shrink-0">
+                <h2 className="text-md tracking-wider">CONSOLE OUTPUT</h2>
+              </div>
+              <div className="overflow-y-auto flex-1 h-0 min-h-0 pr-2 custom-scrollbar">
+                <Thread />
+              </div>
+            </div>
+            <div className="bg-gray-900 p-3 rounded-md border-2 border-green-500 shadow-[0_0_10px_#22c55e] flex-shrink-0">
+              <WebSearchToolUI />
+            </div>
+          </div>
+        </div>
+      </div>
 
-			<style jsx global>{`
+      <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         
         body {
@@ -58,6 +62,26 @@ export default function MyApp() {
           margin: 0;
           padding: 0;
           overflow: hidden;
+        }
+        
+        /* Custom scrollbar styling */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #111;
+          border: 1px solid #22c55e;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #22c55e;
+          border-radius: 2px;
+        }
+        
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #22c55e #111;
         }
         
         /* CRT screen effect */
@@ -134,6 +158,6 @@ export default function MyApp() {
           50% { opacity: 0; }
         }
       `}</style>
-		</AssistantRuntimeProvider>
-	);
+    </AssistantRuntimeProvider>
+  );
 }
