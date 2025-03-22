@@ -1,14 +1,15 @@
 import { Scraper } from 'agent-twitter-client';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
+import type { Cookie } from 'tough-cookie';
 import { retrieveCookies, storeCookies } from '../r2/s3client';
 
 dotenv.config();
 
-// Default user ID for storing cookies
-const DEFAULT_USER_ID = 'twitter-default-user';
+// Default user ID for cookies
+const DEFAULT_USER_ID = 'default';
 
 /**
- * Get an authenticated Twitter scraper instance with R2 cookie storage
+ * Get an authenticated Twitter scraper
  * @param options Configuration options
  * @returns Authenticated scraper instance
  */
@@ -29,82 +30,60 @@ export async function getScraper(options: {
 
   // Try to load cookies from R2
   try {
-    const storedCookies = await retrieveCookies(userId);
-    
-    if (storedCookies && storedCookies.length > 0) {
-      try {
-        // The cookies are stored as objects but need to be converted to strings for the scraper
-        const cookieStrings = storedCookies.map(cookie => {
-          // Use template literals for better readability
-          return `${cookie.key}=${cookie.value}${cookie.domain ? `; Domain=${cookie.domain}` : ''}${cookie.path ? `; Path=${cookie.path}` : ''}${cookie.expires ? `; Expires=${cookie.expires}` : ''}${cookie.httpOnly ? '; HttpOnly' : ''}${cookie.secure ? '; Secure' : ''}${cookie.sameSite ? `; SameSite=${cookie.sameSite}` : ''}`;
-        });
-        
-        if (cookieStrings.length > 0) {
-          // Use the string format that the library expects
-          await scraper.setCookies(cookieStrings);
-          
-          // Verify the cookies are still valid
-          if (await scraper.isLoggedIn()) {
-            console.log('Successfully authenticated using saved cookies from R2');
-            return scraper;
-          }
-          console.log('Saved cookies expired');
-        } else {
-          console.log('No valid cookies found in R2 storage');
-        }
-      } catch (cookieError) {
-        console.error('Error setting cookies:', cookieError);
+    const cookies = await retrieveCookies(userId);
+    if (cookies && cookies.length > 0) {
+      console.log('Setting cookies for Twitter');
+      await scraper.setCookies(cookies);
+      
+      // Verify login worked
+      if (await scraper.isLoggedIn()) {
+        console.log('Successfully authenticated with Twitter using cookies');
+        return scraper;
       }
-
-      // If cookiesOnly is true, don't attempt to login with credentials
-      if (cookiesOnly) {
-        throw new Error('Cookies are invalid and cookiesOnly flag is set');
-      }
+      
+      console.log('Cookies expired, trying to login with credentials');
     }
   } catch (error) {
-    console.error('Error loading cookies from R2:', error);
-
-    // If cookiesOnly is true, propagate the error
-    if (cookiesOnly) {
-      throw error;
+    console.error('Error retrieving Twitter cookies:', error);
+  }
+  
+  // If cookies don't work or cookiesOnly is false, try logging in with credentials
+  if (!cookiesOnly && username && password) {
+    try {
+      console.log('Logging in to Twitter with credentials');
+      await scraper.login(username, password);
+      
+      // Verify login worked
+      if (await scraper.isLoggedIn()) {
+        console.log('Successfully authenticated with Twitter using credentials');
+        
+        // Save cookies for next time
+        try {
+          // Get cookies directly from the scraper
+          const twitterCookies = await scraper.getCookies();
+          
+          // Store cookies with minimal processing, just use type assertion to bridge the API differences
+          // This treats the Twitter cookie format as compatible with our storage format
+          await storeCookies(userId, twitterCookies as unknown as Cookie[]);
+          console.log('Successfully stored Twitter cookies');
+        } catch (saveCookiesError) {
+          console.error('Error saving Twitter cookies:', saveCookiesError);
+        }
+        
+        return scraper;
+      }
+    } catch (loginError) {
+      console.error('Error logging in to Twitter:', loginError);
     }
   }
-
-  // Fall back to password login if cookies don't exist or are invalid
-  if (!username || !password) {
-    throw new Error('Twitter credentials not provided. Set TWITTER_USERNAME and TWITTER_PASSWORD in .env file or pass them as parameters');
+  
+  // If we get here, we couldn't authenticate
+  if (cookiesOnly) {
+    console.warn('No valid Twitter cookies found and cookiesOnly is true');
+  } else {
+    console.error('Failed to authenticate with Twitter');
   }
-
-  console.log('Logging in with credentials...');
-  try {
-    await scraper.login(username, password);
-    
-    // Save the cookies to R2 for future use
-    const cookies = await scraper.getCookies();
-    
-    // Convert Twitter cookie objects to R2 compatible format
-    const storableCookies = cookies.map(cookie => {
-      // Create a simple object with just the properties we need
-      return {
-        key: cookie.key,
-        value: cookie.value,
-        domain: typeof cookie.domain === 'string' ? cookie.domain : undefined,
-        path: typeof cookie.path === 'string' ? cookie.path : undefined,
-        expires: cookie.expires instanceof Date ? cookie.expires.toISOString() : undefined,
-        httpOnly: typeof cookie.httpOnly === 'boolean' ? cookie.httpOnly : undefined,
-        secure: typeof cookie.secure === 'boolean' ? cookie.secure : undefined,
-        sameSite: typeof cookie.sameSite === 'string' ? cookie.sameSite : undefined
-      };
-    });
-    
-    // Store the cookies in a format compatible with R2
-    await storeCookies(userId, storableCookies);
-    console.log('Logged in and saved new cookies to R2');
-  } catch (loginError) {
-    console.error('Login failed:', loginError);
-    throw loginError;
-  }
-
+  
   return scraper;
 }
 

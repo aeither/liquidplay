@@ -1,6 +1,6 @@
 // Import from local types file and auth module
 import { getScraper } from './auth';
-import type { Tweet, Scraper, TweetSearchOptions, GetTweetsOptions } from './types';
+import type { GetTweetsOptions, Scraper, Tweet, TweetSearchOptions } from './types';
 
 // Export interfaces for use by tools
 export interface ProtocolTweet extends Tweet {
@@ -81,7 +81,7 @@ export async function searchTweets(
     // than our interface
     try {
       // Try using the search method if it exists
-      if (twitterScraper.search) {
+      if ('search' in twitterScraper) {
         // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
         const tweetGenerator = await twitterScraper.search(query, { includeReplies });
         
@@ -99,9 +99,9 @@ export async function searchTweets(
         }
         
         return tweets;
-      } else {
-        throw new Error('Search method not available');
       }
+      
+      throw new Error('Search method not available');
     } catch (methodError) {
       // Fallback to getTweets if search doesn't exist
       console.log('Search method not available, falling back to getTweets');
@@ -150,15 +150,13 @@ export async function searchTwitter(
   try {
     // Handle format issues with the query, e.g., convert hashtags or mentions
     const cleanQuery = query.trim();
-    let tweets: Tweet[] = [];
     
     // Twitter client API types don't always match what we need
     // The search method may not exist in the client library implementation
-    // than our interface
     try {
       // Try using the search method if it exists
-      // @ts-ignore - We need to ignore property check because search may not exist
-      if (twitterScraper.search) {
+      // @ts-ignore - We need to ignore property check because search is optional
+      if ('search' in twitterScraper) {
         // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
         const tweetGenerator = await twitterScraper.search(query, { includeReplies });
         
@@ -191,7 +189,6 @@ export async function searchTwitter(
       // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
       const tweetGenerator = await twitterScraper.getTweets(query, limit);
       
-      // Handle generator to array conversion
       const tweets: Tweet[] = [];
       let count = 0;
       
@@ -283,7 +280,7 @@ function calculateRelevanceScore(tweet: Tweet, protocol: string): number {
  */
 export async function getProtocolTweets(
   protocols: string[],
-  tweetsPerProtocol: number = 3,
+  tweetsPerProtocol = 3,
   providedScraper?: Scraper
 ): Promise<Record<string, ProtocolTweet[]>> {
   const scraper = providedScraper || await getScraper();
@@ -297,8 +294,7 @@ export async function getProtocolTweets(
       
       try {
         // Try using the search method if it exists
-        // @ts-ignore - We need to ignore property check because search may not exist
-        if (scraper.search) {
+        if ('search' in scraper) {
           // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
           const tweetGenerator = await scraper.search(searchQuery, { 
             limit: tweetsPerProtocol * 3 // Get a larger sample to filter from
@@ -360,8 +356,8 @@ export async function getProtocolTweets(
 }
 
 // Export auth functions
-export { getScraper } from './auth';
-export { isAuthenticated } from './auth';
+export { getScraper, isAuthenticated } from './auth';
 
 // Export types
-export type { Scraper, Tweet, TweetSearchOptions, GetTweetsOptions };
+export type { GetTweetsOptions, Scraper, Tweet, TweetSearchOptions };
+

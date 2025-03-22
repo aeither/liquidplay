@@ -1,7 +1,7 @@
 // S3 client for Cloudflare R2
 import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import dotenv from 'dotenv';
-
+import type { Cookie } from 'tough-cookie';
 dotenv.config();
 
 // Configure S3 client for Cloudflare R2
@@ -15,22 +15,6 @@ const s3Client = new S3Client({
 });
 
 const bucketName = process.env.R2_BUCKET || "cookies-bucket";
-
-// Example cookie structure based on your existing format
-export interface Cookie {
-    key: string;
-    value: string;
-    expires?: string;
-    maxAge?: number;
-    domain?: string;
-    path?: string;
-    secure?: boolean;
-    hostOnly?: boolean;
-    creation?: string;
-    lastAccessed?: string;
-    sameSite?: string;
-    httpOnly?: boolean;
-}
 
 // Error interface for AWS errors
 interface AwsError extends Error {

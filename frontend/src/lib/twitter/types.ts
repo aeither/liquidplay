@@ -23,42 +23,42 @@ export interface Tweet {
   /**
    * Tweet ID
    */
-  id: string;
+  id: string | undefined;
   
   /**
    * Tweet content
    */
-  text: string;
+  text: string | undefined;
   
   /**
    * Username of tweet author
    */
-  username: string;
+  username: string | undefined;
   
   /**
    * Timestamp of the tweet, can be a string or Date object
    */
-  timeParsed: string | Date;
+  timeParsed: string | Date | undefined;
   
   /**
    * Number of likes
    */
-  likes: number;
+  likes: number | undefined;
   
   /**
    * Number of retweets
    */
-  retweets: number;
+  retweets: number | undefined;
   
   /**
    * Number of replies
    */
-  replies: number;
+  replies: number | undefined;
   
   /**
-   * Whether the tweet author is verified
+   * Whether the tweet author is verified - optional since it might not be provided by all APIs
    */
-  isVerified: boolean;
+  isVerified?: boolean;
   
   /**
    * Optional URL to tweet
@@ -142,17 +142,17 @@ export interface Scraper {
   
   /**
    * Get tweets from a user
-   * Note: The library actually returns AsyncGenerator<Tweet> but we're using
+   * Note: The library actually returns AsyncGenerator<Tweet, any, any> but we're using
    * a more flexible type to handle both direct arrays and generators
    * 
    * The second parameter can be either a number (maxTweets) or an options object
    */
-  getTweets(username: string, maxTweetsOrOptions?: number | GetTweetsOptions | Record<string, unknown>): AsyncGenerator<Tweet, void, unknown> | Promise<Tweet[]>;
+  getTweets(username: string, maxTweetsOrOptions?: number | GetTweetsOptions | Record<string, unknown>): AsyncGenerator<Tweet, unknown, unknown> | Promise<Tweet[]>;
   
   /**
    * Search for tweets - optional method since it may not exist in all scraper implementations
    * Note: The library actually returns AsyncGenerator<Tweet> but we're using
    * a more flexible type to handle both direct arrays and generators
    */
-  search?(query: string, options?: TweetSearchOptions | Record<string, unknown>): AsyncGenerator<Tweet, void, unknown> | Promise<Tweet[]>;
+  search?(query: string, options?: TweetSearchOptions | Record<string, unknown>): AsyncGenerator<Tweet, unknown, unknown> | Promise<Tweet[]>;
 }

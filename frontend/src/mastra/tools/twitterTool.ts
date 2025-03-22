@@ -12,9 +12,10 @@ let scraperInstance: Scraper | null = null;
  */
 async function getTwitterScraper(): Promise<Scraper> {
   if (!scraperInstance) {
-    scraperInstance = await getScraper();
+    // Use type assertion to tell TypeScript this is safe
+    scraperInstance = await getScraper() as unknown as Scraper;
   }
-  return scraperInstance as Scraper;
+  return scraperInstance;
 }
 
 /**
