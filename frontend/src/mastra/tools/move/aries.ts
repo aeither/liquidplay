@@ -61,8 +61,9 @@ export const lendAriesTokensTool = createTool({
   id: 'lend-aries-tokens',
   description: 'Lend tokens on Aries protocol',
   inputSchema: z.object({
-    amount: z.number().positive().describe('Amount of tokens to lend'),
+    amount: z.number().positive().describe('Amount of tokens to lend (decimal amount)'),
     mintType: z.string().describe('Token mint type'),
+    decimals: z.number().int().min(0).max(18).default(8).describe('Token decimals (defaults to 8 for APT)'),
     network: z.enum(['MAINNET', 'TESTNET', 'DEVNET']).default('MAINNET').describe('The Aptos network to use'),
   }),
   outputSchema: z.object({
@@ -70,9 +71,14 @@ export const lendAriesTokensTool = createTool({
   }),
   execute: async ({ context }) => {
     const { agentRuntime } = await createAgentRuntime(context.network as 'MAINNET' | 'TESTNET' | 'DEVNET');
+    
+    // Convert decimal amount to integer amount (e.g., 0.01 APT with 8 decimals becomes 1000000)
+    const decimals = context.decimals || 8; // Default to 8 decimals (common for APT)
+    const amountInSmallestUnit = Math.floor(context.amount * (10 ** decimals));
+    
     const transactionHash = await agentRuntime.lendAriesToken(
-      context.mintType as unknown as MoveStructId,
-      context.amount
+      context.mintType as MoveStructId,
+      amountInSmallestUnit
     );
     return { transactionHash };
   },
