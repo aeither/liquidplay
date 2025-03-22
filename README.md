@@ -1,6 +1,14 @@
-# Move Agent Kit Test Project
+# CAST: Crypto Asset Strategy Tactician
 
-This is a simple test project for working with Move Agent Kit on the Aptos blockchain.
+CAST is an AI-powered gaming agent that operates autonomously within blockchain games on the Aptos ecosystem. It manages in-game assets, optimizes play-to-earn strategies, and facilitates cross-game economies, creating more dynamic and efficient gaming experiences.
+
+## Features
+
+- **Multi-Game Intelligence**: Monitors game states, asset prices, and player activities across multiple games
+- **Strategy Optimization**: Uses ML to analyze gaming patterns and develop optimal strategies
+- **Autonomous Asset Management**: Executes in-game actions and marketplace transactions
+- **Cross-Game Operations**: Facilitates asset transfers and strategies across different games
+- **Performance Analytics**: Tracks gaming and trading performance with detailed metrics
 
 ## Prerequisites
 
@@ -18,9 +26,10 @@ bun install
 2. Configure your `.env` file with your API keys:
 ```
 APTOS_PRIVATE_KEY="your_private_key_here"
-ANTHROPIC_API_KEY="your_anthropic_api_key_here"
-OPENAI_API_KEY="your_openai_api_key_here"
-# PANORA_API_KEY="your_panora_api_key_here" # Optional
+TWITTER_USERNAME="your_twitter_username"
+TWITTER_PASSWORD="your_twitter_password"
+ANTHROPIC_API_KEY="your_anthropic_api_key_here" # For strategy optimization
+OPENAI_API_KEY="your_openai_api_key_here" # For strategy optimization
 ```
 
 3. Run the project:
@@ -28,27 +37,34 @@ OPENAI_API_KEY="your_openai_api_key_here"
 bun index.ts
 ```
 
-Or use the npm script:
-```
-bun run start
-```
+## Project Architecture
 
-## Project Structure
+The system consists of five main components:
 
-- `index.ts`: Main file that demonstrates how to initialize and use Move Agent Kit
-- `.env`: Environment variables for API keys and configuration
-- `package.json`: Project dependencies and scripts
-- `tsconfig.json`: TypeScript configuration
+1. **Game Intelligence System**: Gathers data from games, marketplaces, and social media
+2. **Strategy Optimizer**: Analyzes data to generate optimal gaming strategies
+3. **Asset Manager**: Executes actions within games and marketplaces
+4. **Performance Tracker**: Monitors and reports on performance
+5. **Cross-Game Bridge**: Facilitates operations across multiple gaming ecosystems
 
-## Available Examples
+## Supported Games
 
-The `index.ts` file contains commented examples for:
-- Token transfers
-- Getting account balances
-- Retrieving transaction information
+- [Game Example 1] - Brief description
+- [Game Example 2] - Brief description
+- More games coming soon!
 
-Uncomment the relevant sections to test these features.
+## Use Cases
 
-## Documentation
+- Automated resource farming and crafting
+- Optimal race/battle participation based on rewards
+- Strategic asset trading when prices are favorable
+- Cross-game arbitrage opportunities
+- Tournament and competition optimization
 
-For more information, refer to the [Move Agent Kit documentation](https://github.com/Metamove/move-agent-kit).
+## License
+
+MIT
+
+## Hackathon Submission
+
+This project is being developed for the Aptos GameFi track at [Hackathon Name].
