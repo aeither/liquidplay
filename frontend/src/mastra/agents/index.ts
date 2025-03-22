@@ -1,7 +1,16 @@
 import { groq } from '@ai-sdk/groq';
 import { Agent } from '@mastra/core/agent';
-import { borrowAriesTokensTool, createAriesProfileTool, lendAriesTokensTool, stakeAmnisTokensTool, withdrawAriesTokensTool } from '../tools';
-import { balanceTool } from '../tools/balanceTool';
+import { 
+  balanceTool, 
+  borrowAriesTokensTool, 
+  createAriesProfileTool, 
+  accountTweetsTool,
+  protocolTweetsTool, 
+  lendAriesTokensTool, 
+  searchTwitterTool,
+  stakeAmnisTokensTool, 
+  withdrawAriesTokensTool 
+} from '../tools';
 
 export const moveAgent = new Agent({
   name: 'Move Agent',
@@ -22,7 +31,22 @@ export const moveAgent = new Agent({
       - lendAriesTokensTool: Lend tokens on Aries protocol 
       - borrowAriesTokensTool: Borrow tokens on Aries protocol
       - withdrawAriesTokensTool: Withdraw tokens from Aries protocol
+
+      You can also fetch Twitter information about protocols:
+      - accountTweetsTool: Get tweets from a specific Twitter account
+      - searchTwitterTool: Search for tweets matching a query
+      - protocolTweetsTool: Get relevant tweets for specific Aptos protocols
 `,
   model: groq('qwen-qwq-32b'),
-  tools: { balanceTool, stakeAmnisTokensTool, createAriesProfileTool, lendAriesTokensTool, borrowAriesTokensTool, withdrawAriesTokensTool },
+  tools: { 
+    balanceTool, 
+    stakeAmnisTokensTool, 
+    createAriesProfileTool, 
+    lendAriesTokensTool, 
+    borrowAriesTokensTool, 
+    withdrawAriesTokensTool,
+    accountTweetsTool,
+    searchTwitterTool,
+    protocolTweetsTool
+  },
 });
