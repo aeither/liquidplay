@@ -1,6 +1,7 @@
 import { groq } from '@ai-sdk/groq';
 import { Agent } from '@mastra/core/agent';
-import { weatherTool } from '../tools';
+import { balanceTool } from '../tools/balanceTool';
+import { weatherTool } from '../tools/weatherTool';
 
 export const weatherAgent = new Agent({
   name: 'Weather Agent',
@@ -17,5 +18,5 @@ export const weatherAgent = new Agent({
       Use the weatherTool to fetch current weather data.
 `,
   model: groq('qwen-qwq-32b'),
-  tools: { weatherTool },
+  tools: { weatherTool, balanceTool },
 });
