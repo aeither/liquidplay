@@ -3,7 +3,7 @@ import { Agent } from '@mastra/core/agent';
 import { Step, Workflow } from '@mastra/core/workflows';
 import { z } from 'zod';
 
-const llm = groq('llama-3.3-70b-versatile');
+const llm = groq('qwen-qwq-32b');
 
 const agent = new Agent({
   name: 'Weather Agent',

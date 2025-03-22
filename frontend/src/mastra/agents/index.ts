@@ -16,6 +16,6 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: groq('llama-3.3-70b-versatile'),
+  model: groq('qwen-qwq-32b'),
   tools: { weatherTool },
 });
