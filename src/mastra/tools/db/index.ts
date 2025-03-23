@@ -4,6 +4,8 @@ import { boosts, users } from '@/lib/db/schema';
 import { createTool } from '@mastra/core/tools';
 import { desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { showProfileTool } from './profile';
+export { showProfileTool };
 
 /**
  * Tool to get a leaderboard of users ordered by points

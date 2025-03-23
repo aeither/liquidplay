@@ -17,7 +17,7 @@ import { z } from 'zod';
 const createAgentRuntime = async (networkName: 'MAINNET' | 'TESTNET' | 'DEVNET' = 'MAINNET') => {
   // Get private key from environment variable
   const privateKeyValue = process.env.PRIVATE_KEY;
-  
+
   if (!privateKeyValue) {
     throw new Error('Private key is required but not found in environment variables');
   }
@@ -26,7 +26,7 @@ const createAgentRuntime = async (networkName: 'MAINNET' | 'TESTNET' | 'DEVNET' 
   const network = Network[networkName];
   const aptosConfig = new AptosConfig({ network });
   const aptos = new Aptos(aptosConfig);
-  
+
   // Derive account from private key
   const account = await aptos.deriveAccountFromPrivateKey({
     privateKey: new Ed25519PrivateKey(
@@ -50,7 +50,7 @@ export const lendJouleFinanceTool = createTool({
     mint: z.string().describe('Token mint address'),
     positionId: z.string().describe('Position ID'),
     newPosition: z.boolean().default(false).describe('Whether this is a new position'),
-    fungibleAsset: z.boolean().default(true).describe('Whether the token is a fungible asset'),
+    fungibleAsset: z.boolean().default(false).describe('Whether the token is a fungible asset'),
     network: z.enum(['MAINNET', 'TESTNET', 'DEVNET']).default('MAINNET').describe('The Aptos network to use'),
   }),
   outputSchema: z.object({
@@ -64,7 +64,7 @@ export const lendJouleFinanceTool = createTool({
       context.mint as MoveStructId,
       context.positionId,
       context.newPosition,
-      context.fungibleAsset
+      false // context.fungibleAsset
     );
   },
 });
@@ -77,7 +77,7 @@ export const withdrawJouleFinanceTool = createTool({
     amount: z.number().describe('Amount of tokens to withdraw'),
     mint: z.string().describe('Token mint address'),
     positionId: z.string().describe('Position ID'),
-    fungibleAsset: z.boolean().default(true).describe('Whether the token is a fungible asset'),
+    fungibleAsset: z.boolean().default(false).describe('Whether the token is a fungible asset'),
     network: z.enum(['MAINNET', 'TESTNET', 'DEVNET']).default('MAINNET').describe('The Aptos network to use'),
   }),
   outputSchema: z.object({
@@ -90,7 +90,7 @@ export const withdrawJouleFinanceTool = createTool({
       context.amount,
       context.mint as MoveStructId,
       context.positionId,
-      context.fungibleAsset
+      false // context.fungibleAsset
     );
   },
 });
@@ -103,7 +103,7 @@ export const borrowJouleFinanceTool = createTool({
     amount: z.number().describe('Amount of tokens to borrow'),
     mint: z.string().describe('Token mint address'),
     positionId: z.string().describe('Position ID'),
-    fungibleAsset: z.boolean().default(true).describe('Whether the token is a fungible asset'),
+    fungibleAsset: z.boolean().default(false).describe('Whether the token is a fungible asset'),
     network: z.enum(['MAINNET', 'TESTNET', 'DEVNET']).default('MAINNET').describe('The Aptos network to use'),
   }),
   outputSchema: z.object({
@@ -116,7 +116,7 @@ export const borrowJouleFinanceTool = createTool({
       context.amount,
       context.mint as MoveStructId,
       context.positionId,
-      context.fungibleAsset
+      false // context.fungibleAsset
     );
   },
 });
@@ -129,7 +129,7 @@ export const repayJouleFinanceTool = createTool({
     amount: z.number().describe('Amount of tokens to repay'),
     mint: z.string().describe('Token mint address'),
     positionId: z.string().describe('Position ID'),
-    fungibleAsset: z.boolean().default(true).describe('Whether the token is a fungible asset'),
+    fungibleAsset: z.boolean().default(false).describe('Whether the token is a fungible asset'),
     network: z.enum(['MAINNET', 'TESTNET', 'DEVNET']).default('MAINNET').describe('The Aptos network to use'),
   }),
   outputSchema: z.object({
@@ -142,7 +142,7 @@ export const repayJouleFinanceTool = createTool({
       context.amount,
       context.mint as MoveStructId,
       context.positionId,
-      context.fungibleAsset
+      false // context.fungibleAsset
     );
   },
 });
@@ -161,12 +161,12 @@ export const getUserPositionTool = createTool({
   }),
   execute: async ({ context }) => {
     const { agentRuntime, account } = await createAgentRuntime(context.network as 'MAINNET' | 'TESTNET' | 'DEVNET');
-    const userAddress = context.userAddress 
-      ? AccountAddress.fromString(context.userAddress) 
+    const userAddress = context.userAddress
+      ? AccountAddress.fromString(context.userAddress)
       : account.accountAddress;
-      
+
     const position = await agentRuntime.getUserPosition(userAddress, context.positionId);
-    
+
     return { position };
   },
 });
@@ -184,12 +184,12 @@ export const getAllUserPositionsTool = createTool({
   }),
   execute: async ({ context }) => {
     const { agentRuntime, account } = await createAgentRuntime(context.network as 'MAINNET' | 'TESTNET' | 'DEVNET');
-    const userAddress = context.userAddress 
-      ? AccountAddress.fromString(context.userAddress) 
+    const userAddress = context.userAddress
+      ? AccountAddress.fromString(context.userAddress)
       : account.accountAddress;
-      
+
     const positions = await agentRuntime.getUserAllPositions(userAddress);
-    
+
     return { positions };
   },
 });

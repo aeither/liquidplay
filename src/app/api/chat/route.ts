@@ -50,6 +50,7 @@ export async function POST(req: Request) {
   console.log('plan: ', object);
 
   if (object === 'move') {
+
     const myAgent = mastra.getAgent('moveAgent');
     const stream = await myAgent.stream(messages);
     return stream.toDataStreamResponse({ sendReasoning: false });

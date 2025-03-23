@@ -8,13 +8,15 @@ import {
   getAllProtocolsTool,
   getLeaderboardTool,
   lendAriesTokensTool,
+  lendJouleFinanceTool,
   protocolTweetsTool,
   searchTwitterTool,
   stakeAmnisTokensTool,
   twitterAnalysisTool,
-  withdrawAriesTokensTool
+  withdrawAriesTokensTool,
+  withdrawJouleFinanceTool
 } from '../tools';
-import { showProfileTool } from '../tools/uiTool';
+import { showProfileTool } from '../tools/db/profile';
 
 export const moveAgent = new Agent({
   name: 'Move Agent',
@@ -35,6 +37,8 @@ export const moveAgent = new Agent({
       - lendAriesTokensTool: Lend tokens on Aries protocol 
       - borrowAriesTokensTool: Borrow tokens on Aries protocol
       - withdrawAriesTokensTool: Withdraw tokens from Aries protocol
+      - lendJouleFinanceTool: Lend tokens on Joule Finance
+      - withdrawJouleFinanceTool: Withdraw tokens from Joule Finance
 
       You can also fetch Twitter information about protocols:
       - accountTweetsTool: Get tweets from a specific Twitter account
@@ -44,6 +48,8 @@ export const moveAgent = new Agent({
 `,
   model: groq('qwen-qwq-32b'),
   tools: {
+    lendJouleFinanceTool,
+    withdrawJouleFinanceTool,
     balanceTool,
     stakeAmnisTokensTool,
     createAriesProfileTool,
