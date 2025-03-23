@@ -5,6 +5,8 @@ import {
   balanceTool,
   borrowAriesTokensTool,
   createAriesProfileTool,
+  getAllProtocolsTool,
+  getLeaderboardTool,
   lendAriesTokensTool,
   protocolTweetsTool,
   searchTwitterTool,
@@ -85,7 +87,9 @@ export const showProfileAgent = new Agent({
   `,
   model: groq('qwen-qwq-32b'),
   tools: {
-    showProfileTool
+    showProfileTool,
+    getLeaderboardTool,
+    getAllProtocolsTool
   },
 });
 
