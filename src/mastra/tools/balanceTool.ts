@@ -23,12 +23,22 @@ export const balanceTool = createTool({
     balance: z.string(),
     network: z.string(),
   }),
-  execute: async () => {
+  execute: async ({mastra}) => {
+
+    if (!mastra) {
+      throw new Error('Mastra instance is required');
+    }
+    const workflow = mastra.getWorkflow("weatherWorkflow");
+    const { start } = await workflow.createRun({});
+    const result = await start({ triggerData: { city: "Beijing" } })
+    console.log("results", result);
+
     return await getWalletBalance();
   },
 });
 
 const getWalletBalance = async () => {
+
   // Get private key from environment variable
   const privateKeyValue = process.env.PRIVATE_KEY;
 

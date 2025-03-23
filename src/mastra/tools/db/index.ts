@@ -1,9 +1,9 @@
 // create the tools for database
-import { createTool } from '@mastra/core/tools';
-import { z } from 'zod';
 import { db } from '@/lib/db/drizzle';
-import { users, boosts } from '@/lib/db/schema';
+import { boosts, users } from '@/lib/db/schema';
+import { createTool } from '@mastra/core/tools';
 import { desc, eq, sql } from 'drizzle-orm';
+import { z } from 'zod';
 
 /**
  * Tool to get a leaderboard of users ordered by points
@@ -94,9 +94,9 @@ export const upsertUserTool = createTool({
       wasCreated: z.boolean(),
     }),
   }),
-  execute: async ({ context }) => {
+  execute: async ({ context,mastra }) => {
     const { address, points } = context;
-    
+
     // Normalize address to lowercase
     const userAddress = address.toLowerCase();
     const pointsToAdd = points.toString();
