@@ -1,4 +1,4 @@
-import { type Scraper, SearchMode, type Tweet } from 'agent-twitter-client';
+import type { Scraper, Tweet } from 'agent-twitter-client';
 import { getScraper } from './auth';
 
 /**
@@ -55,7 +55,6 @@ export async function searchTweets(
   query: string,
   options: {
     limit?: number;
-    mode?: SearchMode;
     minLikes?: number;
     minRetweets?: number;
     minReplies?: number;
@@ -71,7 +70,8 @@ export async function searchTweets(
     // Search for Aptos web3 with a limit of 5 tweets
     const searchResults: Tweet[] = [];
 
-    for await (const tweet of twitterClient.searchTweets(query, options.mode || SearchMode.Top)) {
+    const tweets = await twitterClient.searchTweets(query, options.limit || 5);
+    for await (const tweet of tweets) {
       searchResults.push(tweet);
 
       if (searchResults.length >= (options.limit || 5)) break;

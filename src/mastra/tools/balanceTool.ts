@@ -23,15 +23,15 @@ export const balanceTool = createTool({
     balance: z.string(),
     network: z.string(),
   }),
-  execute: async ({mastra}) => {
+  execute: async ({ mastra }) => {
 
-    if (!mastra) {
-      throw new Error('Mastra instance is required');
-    }
-    const workflow = mastra.getWorkflow("weatherWorkflow");
-    const { start } = await workflow.createRun({});
-    const result = await start({ triggerData: { city: "Beijing" } })
-    console.log("results", result);
+    // if (!mastra) {
+    //   throw new Error('Mastra instance is required');
+    // }
+    // const workflow = mastra.getWorkflow("weatherWorkflow");
+    // const { start } = await workflow.createRun({});
+    // const result = await start({ triggerData: { city: "Beijing" } })
+    // console.log("results", result);
 
     return await getWalletBalance();
   },
