@@ -9,9 +9,9 @@ import {
   protocolTweetsTool,
   searchTwitterTool,
   stakeAmnisTokensTool,
+  twitterAnalysisTool,
   withdrawAriesTokensTool
 } from '../tools';
-import { twitterAnalysisTool } from '../tools/twitter';
 
 export const moveAgent = new Agent({
   name: 'Move Agent',
@@ -59,24 +59,17 @@ export const twitterAgent = new Agent({
   instructions: `
       You are a helpful Twitter assistant that provides information and performs actions on Twitter.
 
-      Your primary function is to help users interact with Twitter. When responding:
-      - Always ask for necessary details if none are provided (username, query, etc.)
-      - Check user's Twitter profile before performing operations
-      - Provide transaction details after successful operations
-      - Explain any errors that might occur during transactions
-      - Keep responses concise but informative
-
       You can use various tools to interact with Twitter:
       - accountTweetsTool: Get tweets from a specific Twitter account
       - searchTwitterTool: Search for tweets matching a query
       - protocolTweetsTool: Get relevant tweets for specific Aptos protocols
-      - twitterAnalysisTool: Analyze Twitter activity for blockchain protocols
+      - twitterAnalysisTool: Get Aptos Dapps protocols Twitter activity with relevance scoring
 `,
   model: groq('qwen-qwq-32b'),
   tools: {
-    accountTweetsTool,
-    searchTwitterTool,
-    protocolTweetsTool,
+    // accountTweetsTool,
+    // searchTwitterTool,
+    // protocolTweetsTool,
     twitterAnalysisTool
   },
 });

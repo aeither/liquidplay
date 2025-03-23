@@ -13,7 +13,7 @@ async function main(): Promise<void> {
       // Explicitly set cookiesOnly to false to use credentials if cookies fail
       cookiesOnly: true,
     });
-    
+
     // Example 1: Get tweets from a specific account
     const accountTweets: Tweet[] = await getTweetsFromAccount('AptosLabs', 5, scraper);
     console.log('\n--- Tweets from @AptosLabs ---');
@@ -21,7 +21,7 @@ async function main(): Promise<void> {
       const text = tweet.text || '';
       console.log(`${tweet.timeParsed || 'Unknown date'}: ${text.substring(0, 100)}... [${tweet.likes ?? 0} likes, ${tweet.retweets ?? 0} RTs]`);
     }
-    
+
     // Example 2: Search for tweets mentioning "Aptos"
     const searchResults: Tweet[] = await searchTweets('Aptos web3', { limit: 5 }, scraper);
     console.log('\n--- Search results for "Aptos web3" ---');
@@ -29,12 +29,12 @@ async function main(): Promise<void> {
       const text = tweet.text || '';
       console.log(`@${tweet.username}: ${text.substring(0, 100)}... [${tweet.likes ?? 0} likes]`);
     }
-    
+
     // Example 3: Get tweets for multiple protocols
-    const protocols: string[] = ['Joule', 'Thala', 'LiquidSwap'];
+    const protocols: string[] = ['Joule', 'Thala', 'LiquidSwap', 'Amnis'];
     console.log(`\n--- Fetching tweets for protocols: ${protocols.join(', ')} ---`);
     const protocolTweets: Record<string, ProtocolTweet[]> = await getProtocolTweets(protocols, 3, scraper);
-    
+
     // Display results for each protocol
     for (const [protocol, tweets] of Object.entries(protocolTweets)) {
       console.log(`\n${protocol} (${tweets.length} tweets):`);
@@ -45,7 +45,7 @@ async function main(): Promise<void> {
         console.log(`  ${i}. [Score: ${tweet.relevanceScore.toFixed(1)}] @${tweet.username}: ${text.substring(0, 80)}...`);
       }
     }
-    
+
   } catch (error) {
     console.error('Error running Twitter example:', error);
   }

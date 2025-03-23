@@ -193,18 +193,7 @@ export const protocolTweetsTool = createTool({
 export const twitterAnalysisTool = createTool({
   id: 'twitter-analysis',
   description: 'Analyze Twitter activity for blockchain protocols and topics with relevance scoring',
-  inputSchema: z.object({
-    // Main input parameters
-    protocols: z.array(z.string()).describe('Array of protocol or topic names to analyze'),
-    tweetsPerProtocol: z.number().default(3).describe('Number of tweets to fetch per protocol'),
-    
-    // Optional tweet filtering parameters
-    includeReplies: z.boolean().default(false).describe('Whether to include replies in results'),
-    minLikes: z.number().optional().describe('Minimum number of likes for tweets to include'),
-    
-    // Optional account analysis
-    includeAccounts: z.array(z.string()).optional().describe('Optional accounts to include in the analysis'),
-  }),
+  inputSchema: z.object({}),
   outputSchema: z.object({
     results: z.record(
       z.array(
@@ -235,13 +224,13 @@ export const twitterAnalysisTool = createTool({
     }),
   }),
   execute: async ({ context }) => {
-    const { 
-      protocols,
-      tweetsPerProtocol = 3,
-      includeReplies = false,
-      minLikes,
-      includeAccounts = [],
-    } = context;
+    // Fixed protocols list
+    const protocols: string[] = ['PontemNetwork', 'ThalaLabs', 'JouleFinance', 'AmnisFinance'];
+    // Hard coded parameters
+    const tweetsPerProtocol = 3;
+    const includeReplies = false;
+    const minLikes = undefined;
+    const includeAccounts: string[] = [];
     
     // Get the scraper first
     const scraper = await getTwitterScraper();

@@ -1,7 +1,7 @@
 // Import Scraper type separately to avoid initialization problems
 import type { Scraper } from 'agent-twitter-client';
 import * as dotenv from 'dotenv';
-import type { Cookie } from 'tough-cookie';
+import { Cookie } from 'tough-cookie';
 import { retrieveCookies, storeCookies } from '../r2/s3client';
 
 // Dynamically import the Scraper class to avoid initialization issues
@@ -27,7 +27,7 @@ export async function getScraper(options: {
   password?: string;
 } = {}): Promise<Scraper> {
   const {
-    cookiesOnly = false,
+    cookiesOnly = true,
     userId = DEFAULT_USER_ID,
     username = process.env.TWITTER_USERNAME,
     password = process.env.TWITTER_PASSWORD
@@ -39,38 +39,63 @@ export async function getScraper(options: {
 
   // Try to load cookies from R2
   try {
-    const cookies = await retrieveCookies(userId);
-    if (cookies && cookies.length > 0) {
-      console.log('Setting cookies for Twitter');
-      await scraper.setCookies(cookies);
-      
-      // Verify login worked
-      if (await scraper.isLoggedIn()) {
-        console.log('Successfully authenticated with Twitter using cookies');
-        return scraper;
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    const cookies: any = await retrieveCookies(userId);
+    console.log('Setting cookies for Twitter');
+
+    // The agent-twitter-client library expects cookie strings, not Cookie objects
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    const cookieStrings = cookies.map((cookieJson: any) => {
+      // Convert each cookie JSON to a string
+      try {
+        const cookie = Cookie.fromJSON(cookieJson);
+        if (cookie) {
+          return cookie.toString();
+        }
+        return null;
+      } catch (err) {
+        console.error('Error converting cookie:', err);
+        return null;
       }
-      
-      console.log('Cookies expired, trying to login with credentials');
+    }).filter(Boolean); // Filter out null values
+
+    if (cookieStrings.length > 0) {
+      try {
+        // Set the cookies using the string format
+        await scraper.setCookies(cookieStrings);
+
+        // Verify login worked
+        if (await scraper.isLoggedIn()) {
+          console.log('Successfully authenticated with Twitter using cookies');
+          return scraper;
+        }
+
+        console.log('Cookies expired, trying to login with credentials');
+      } catch (cookieError) {
+        console.error('Error setting cookies:', cookieError);
+      }
+    } else {
+      console.log('No valid cookie strings could be created from stored cookies');
     }
   } catch (error) {
     console.error('Error retrieving Twitter cookies:', error);
   }
-  
+
   // If cookies don't work or cookiesOnly is false, try logging in with credentials
   if (!cookiesOnly && username && password) {
     try {
       console.log('Logging in to Twitter with credentials');
       await scraper.login(username, password);
-      
+
       // Verify login worked
       if (await scraper.isLoggedIn()) {
         console.log('Successfully authenticated with Twitter using credentials');
-        
+
         // Save cookies for next time
         try {
           // Get cookies directly from the scraper
           const twitterCookies = await scraper.getCookies();
-          
+
           // Store cookies with minimal processing, just use type assertion to bridge the API differences
           // This treats the Twitter cookie format as compatible with our storage format
           await storeCookies(userId, twitterCookies as unknown as Cookie[]);
@@ -78,21 +103,21 @@ export async function getScraper(options: {
         } catch (saveCookiesError) {
           console.error('Error saving Twitter cookies:', saveCookiesError);
         }
-        
+
         return scraper;
       }
     } catch (loginError) {
       console.error('Error logging in to Twitter:', loginError);
     }
   }
-  
+
   // If we get here, we couldn't authenticate
   if (cookiesOnly) {
     console.warn('No valid Twitter cookies found and cookiesOnly is true');
   } else {
     console.error('Failed to authenticate with Twitter');
   }
-  
+
   return scraper;
 }
 
