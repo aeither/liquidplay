@@ -6,28 +6,28 @@ import { boosts, users } from "./schema";
 async function seed() {
   console.log("Seeding database...");
 
-  // Seed 20 users with random points
+  // Seed 20 users with random points (Aptos addresses)
   const dummyUsers = [
-    { address: "0x206b266f0072831973ab554d0a36c143a5087fa4", points: "5.93" },
-    { address: "0x0271a6f6b17e32401debd3ec4448011d0379d966", points: "57.33" },
-    { address: "0x2a02cc17149004430a1064fc535f152ee6ab362d", points: "11.88" },
-    { address: "0xb5a0991c49d4b0bffef562070d917b6af338b602", points: "23.98" },
-    { address: "0xc862a8d6cf4b1506360f610c0325db26621a8d58", points: "26.54" },
-    { address: "0xc8a6bae2363356689f9d60616179b375fb5f0b2c", points: "86.13" },
-    { address: "0xb92b08d5d64cd09fc6cf68667bb04acd61a588c1", points: "5.72" },
-    { address: "0x0cb951f80d77b839da9e978f4bfdc3335b068c53", points: "23.33" },
-    { address: "0x134c0688f60ec16897c19a5ed6916693670764fb", points: "52.27" },
-    { address: "0x901483c58959251a99ae082068b5f61414fd4126", points: "64.92" },
-    { address: "0xc37a275333fdcde177ea68559e1675483d2f0243", points: "72.74" },
-    { address: "0xd4bf3a161d82488ffea14fa80ff7656666c21de9", points: "78.17" },
-    { address: "0xe4e316a3854f16c8d6fcb076fdda2a70a9fad687", points: "68.23" },
-    { address: "0x4f15c61bd2786b5760c9221ef139d56fa2770d12", points: "18.97" },
-    { address: "0x4758abb30371b261c0a56b71d6abd0ad75c19240", points: "30.61" },
-    { address: "0x0be2e12811b0cc43cb10fdbfe6ee10a7b9353cf7", points: "26.81" },
-    { address: "0x1ec1c8d8e3ccabbfe569f9dbf0f1b3cfc590b299", points: "90.16" },
-    { address: "0x3f841b0098d5984a6371f212262ba53984792da0", points: "81.56" },
-    { address: "0x13779dfd6472887dd8ae9bfffe82b628b939af0f", points: "63.73" },
-    { address: "0x9c271519b031104dcde5e57b50487d2370aab237", points: "92.86" }
+    { address: "0xc27e8b8e5a3789802942c4b058bb63f25675c7139881932a17467e1c1ed17ee1", points: "5.93" },
+    { address: "0x7e31cd33ff6cd65603dbfc3dba2c38f27b37c759a4c05e7f092751b42af955bc", points: "57.33" },
+    { address: "0x2f45c965f7e3d7de75ca5ea8a4c9d1546e2a5849c5d939f9f9af3ef16143c67a", points: "11.88" },
+    { address: "0xb48a9a4c5bed752d9f6cd85742d5d9db83817c8ebb7f107123db5ae159986b38", points: "23.98" },
+    { address: "0x14b1a9db49f664dc2cee45ebca9772d6205389a23ef22365bf5053f80cf1cf7b", points: "26.54" },
+    { address: "0xe893a1e213b52e71c1a0101c7df5d413b5e29dbf4842d089a9eeb8a9e22797f2", points: "86.13" },
+    { address: "0x8a92d3fbd91e0e1c0e0d129d94f3c7398b954ba9a69caf30f5729fdfd667c816", points: "5.72" },
+    { address: "0x6e36f10fcd0fad0536a7c8cc94c7557b79ec31bf7f73f68d9f92d30d1b4477d5", points: "23.33" },
+    { address: "0x93e553f3d32b94bc041f886e0af46120e6236e2471845d362fc9842c0ed95d9a", points: "52.27" },
+    { address: "0xa15f0e6c0fa091e0737f869f6a13bcbc4b8347ce7510d1a5fa9ca13f9fb4f77c", points: "64.92" },
+    { address: "0x17d9ae76e393a1c7f892785fa0db9e6a36b08d29ada4c6e1c868baee7108b438", points: "72.74" },
+    { address: "0x4c3e8ca478e5b9a6d5e689c90cd9237b0acce269d353455effa5c6a4d6372f3f", points: "78.17" },
+    { address: "0x29a5a51c21ee89d16b03a6dee5d278a121f383957b1bfecb7f1968d34f9286d2", points: "68.23" },
+    { address: "0xf12e3c5f93f8608f3b61b1a3cf8b2df5394aaed913ccea153226c38425952e71", points: "18.97" },
+    { address: "0x2de2cf267e93be5a10c3b40158bcb7788ecd1a3b6f9043d057c94956d4141b4a", points: "30.61" },
+    { address: "0xd1fa242dd707b236b712e4234639a38af62a7dc85f6e3e19926741a96a68f742", points: "26.81" },
+    { address: "0x1bfdd987cefd90e2c58b85e58f59469456eaa2686a3269d2e2b3c7ac700cdff9", points: "90.16" },
+    { address: "0x5c10a09e5770aee21f101793218cebf9122b8543c56475dc1c0f2b73a55ed5a3", points: "81.56" },
+    { address: "0x8ac79c7d636042c19a678e87b9bb23e4308efc98b886e067e57fdeeacf92eb16", points: "63.73" },
+    { address: "0x34a3d35012f14fefd5e17359e9f149cfa7c1d13c2f7d2e9653ad03bb8cb1bd3e", points: "92.86" }
   ];
 
   for (const user of dummyUsers) {

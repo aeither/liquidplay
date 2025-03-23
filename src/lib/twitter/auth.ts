@@ -3,6 +3,7 @@ import type { Scraper } from 'agent-twitter-client';
 import * as dotenv from 'dotenv';
 import { Cookie } from 'tough-cookie';
 import { retrieveCookies, storeCookies } from '../r2/s3client';
+dotenv.config();
 
 // Dynamically import the Scraper class to avoid initialization issues
 async function getScraperClass() {
@@ -10,7 +11,6 @@ async function getScraperClass() {
   return Scraper;
 }
 
-dotenv.config();
 
 // Default user ID for cookies
 const DEFAULT_USER_ID = 'default';
