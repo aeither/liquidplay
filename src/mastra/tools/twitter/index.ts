@@ -121,7 +121,6 @@ export const protocolTweetsTool = createTool({
   id: 'get-protocol-tweets',
   description: 'Get tweets related to blockchain protocols',
   inputSchema: z.object({
-    protocols: z.array(z.string()).describe('Array of protocol names'),
     tweetsPerProtocol: z.number().default(3).describe('Number of tweets to fetch per protocol'),
   }),
   outputSchema: z.object({
@@ -143,7 +142,8 @@ export const protocolTweetsTool = createTool({
     ),
   }),
   execute: async ({ context }) => {
-    const { protocols, tweetsPerProtocol } = context;
+    const { tweetsPerProtocol } = context;
+    const protocols: string[] = ['PontemNetwork', 'ThalaLabs', 'JouleFinance', 'AmnisFinance'];
 
     // Get the scraper first
     const scraper = await getTwitterScraper();

@@ -62,40 +62,22 @@ export async function searchTweets(
   } = {},
   scraper?: Scraper
 ): Promise<Tweet[]> {
-  const {
-    limit = 20,
-    mode = SearchMode.Latest,
-    minLikes = 0,
-    minReplies = 0,
-    minRetweets = 0
-  } = options;
-
-  const tweets: Tweet[] = [];
-
   // Get a scraper instance if not provided
   const twitterClient = scraper || await getScraper();
 
   try {
     console.log(`Searching for tweets with query: "${query}"...`);
 
-    // Fetch tweets using the generator
-    for await (const tweet of twitterClient.searchTweets(query, mode)) {
-      // Apply filters
-      if (
-        (tweet.likes || 0) < minLikes ||
-        (tweet.retweets || 0) < minRetweets ||
-        (tweet.replies || 0) < minReplies
-      ) {
-        continue;
-      }
+    // Search for Aptos web3 with a limit of 5 tweets
+    const searchResults: Tweet[] = [];
 
-      tweets.push(tweet);
+    for await (const tweet of twitterClient.searchTweets(query, options.mode || SearchMode.Top)) {
+      searchResults.push(tweet);
 
-      if (tweets.length >= limit) break;
+      if (searchResults.length >= (options.limit || 5)) break;
     }
-    console.log(`Found ${tweets.length} tweets for query: "${query}"`, tweets);
 
-    return tweets;
+    return searchResults;
   } catch (error) {
     console.error(`Error searching for tweets with query "${query}":`, error);
     throw error;
@@ -103,8 +85,8 @@ export async function searchTweets(
 }
 
 /**
- * Get tweets related to Aptos protocols
- * @param protocols List of protocol names to fetch tweets for
+ * Get tweets from protocol Twitter accounts
+ * @param protocols List of Twitter handles to fetch tweets from
  * @param limit Maximum number of tweets per protocol
  * @param scraper Optional authenticated scraper instance
  * @returns Map of protocol names to their tweets
@@ -114,20 +96,6 @@ export async function getProtocolTweets(
   limit = 10,
   scraper?: Scraper
 ): Promise<Record<string, ProtocolTweet[]>> {
-  // Protocol Twitter accounts mapping (handle → protocol name)
-  const protocolAccounts: Record<string, string> = {
-    'JouleFinance': 'Joule',
-    'AmnisProtocol': 'Amnis',
-    'ThalaLabs': 'Thala',
-    'Econia': 'Echelon',
-    'LiquidswapDEX': 'LiquidSwap',
-    'PanoraFi': 'Panora',
-    'AriesMarkets': 'Aries',
-    'EchoLabs_XYZ': 'Echo',
-    'AptosLabs': 'Aptos',
-    'AptosFDN': 'Aptos',
-  };
-
   // Initialize result object
   const protocolTweets: Record<string, ProtocolTweet[]> = {};
 
@@ -139,26 +107,23 @@ export async function getProtocolTweets(
     protocolTweets[protocol] = [];
   }
 
-  // Process each protocol account
-  for (const [handle, protocolName] of Object.entries(protocolAccounts)) {
-    // Skip if not in requested protocols
-    if (!protocols.includes(protocolName)) continue;
-
+  // Get tweets directly from each protocol account
+  for (const protocol of protocols) {
     try {
-      const tweets = await getTweetsFromAccount(handle, limit, twitterClient);
+      const tweets = await getTweetsFromAccount(protocol, limit, twitterClient);
 
       // Add source info and convert to ProtocolTweet
       for (const tweet of tweets) {
-        protocolTweets[protocolName].push({
+        protocolTweets[protocol].push({
           ...tweet,
-          protocol: protocolName,
-          source: handle,
-          relevanceScore: calculateRelevanceScore(tweet, protocolName),
+          protocol: protocol,
+          source: protocol,
+          relevanceScore: calculateRelevanceScore(tweet, protocol),
         });
       }
     } catch (error) {
-      console.error(`Error fetching tweets for ${protocolName} (@${handle}):`, error);
-      // Continue with other accounts
+      console.error(`Error fetching tweets for ${protocol}:`, error);
+      // Continue with other protocols
     }
   }
 
@@ -175,9 +140,8 @@ export async function getProtocolTweets(
 
       // Add source info and convert to ProtocolTweet
       for (const tweet of mentionTweets) {
-        // Skip if from official account (already included)
-        if (tweet.username && Object.entries(protocolAccounts).some(([handle, proto]) =>
-          proto === protocol && handle.toLowerCase() === tweet.username?.toLowerCase())) {
+        // Skip if from the official account (already included)
+        if (tweet.username && tweet.username.toLowerCase() === protocol.toLowerCase()) {
           continue;
         }
 
