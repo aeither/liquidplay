@@ -1,8 +1,8 @@
 import { createTool } from '@mastra/core/tools';
+import type { Scraper } from 'agent-twitter-client';
 import { z } from 'zod';
 import { getScraper } from "../../../lib/twitter/auth";
 import { getProtocolTweets, getTweetsFromAccount, searchTweets } from "../../../lib/twitter/index";
-import type { Scraper } from "../../../lib/twitter/types";
 
 // Keep a single scraper instance for better performance and to avoid login throttling
 let scraperInstance: Scraper | null = null;
@@ -38,20 +38,20 @@ export const accountTweetsTool = createTool({
         likes: z.number().optional(),
         retweets: z.number().optional(),
         replies: z.number().optional(),
-        isVerified: z.boolean().optional(),
       })
     ),
   }),
   execute: async ({ context }) => {
     const { username, limit } = context;
-    
+    console.log("🚀 ~ execute: ~ username:", username)
+
     // Get the scraper first
     const scraper = await getTwitterScraper();
-    
+
     // Get tweets from the specified account
     const tweets = await getTweetsFromAccount(username, limit, scraper);
-    
-    // Map tweets to a simpler format for the tool response
+    console.log("🚀 ~ execute: ~ tweets:", tweets)
+    // Return the tweets directly
     return {
       tweets: tweets.map(tweet => ({
         id: tweet.id,
@@ -61,7 +61,6 @@ export const accountTweetsTool = createTool({
         likes: tweet.likes,
         retweets: tweet.retweets,
         replies: tweet.replies,
-        isVerified: tweet.isVerified
       }))
     };
   }
@@ -88,19 +87,18 @@ export const searchTwitterTool = createTool({
         likes: z.number().optional(),
         retweets: z.number().optional(),
         replies: z.number().optional(),
-        isVerified: z.boolean().optional(),
       })
     ),
   }),
   execute: async ({ context }) => {
     const { query, limit, includeReplies } = context;
-    
+
     // Get the scraper first
     const scraper = await getTwitterScraper();
-    
+
     // Search for tweets matching the query
-    const tweets = await searchTweets(query, { limit, includeReplies }, scraper);
-    
+    const tweets = await searchTweets(query, { limit, }, scraper);
+
     // Map tweets to a simpler format for the tool response
     return {
       tweets: tweets.map(tweet => ({
@@ -111,7 +109,6 @@ export const searchTwitterTool = createTool({
         likes: tweet.likes,
         retweets: tweet.retweets,
         replies: tweet.replies,
-        isVerified: tweet.isVerified
       }))
     };
   }
@@ -147,13 +144,13 @@ export const protocolTweetsTool = createTool({
   }),
   execute: async ({ context }) => {
     const { protocols, tweetsPerProtocol } = context;
-    
+
     // Get the scraper first
     const scraper = await getTwitterScraper();
-    
+
     // Get tweets for the protocols
     const protocolResults = await getProtocolTweets(protocols, tweetsPerProtocol, scraper);
-    
+
     // Map results to a simpler format for the tool response
     const formattedResults: Record<string, Array<{
       id?: string;
@@ -163,11 +160,10 @@ export const protocolTweetsTool = createTool({
       likes?: number;
       retweets?: number;
       replies?: number;
-      isVerified?: boolean;
       protocol: string;
       relevanceScore: number;
     }>> = {};
-    
+
     for (const [protocol, tweets] of Object.entries(protocolResults)) {
       formattedResults[protocol] = tweets.map(tweet => ({
         id: tweet.id,
@@ -177,12 +173,11 @@ export const protocolTweetsTool = createTool({
         likes: tweet.likes,
         retweets: tweet.retweets,
         replies: tweet.replies,
-        isVerified: tweet.isVerified,
         protocol: tweet.protocol,
         relevanceScore: tweet.relevanceScore
       }));
     }
-    
+
     return { results: formattedResults };
   }
 });
@@ -231,10 +226,10 @@ export const twitterAnalysisTool = createTool({
     const includeReplies = false;
     const minLikes = undefined;
     const includeAccounts: string[] = [];
-    
+
     // Get the scraper first
     const scraper = await getTwitterScraper();
-    
+
     // Define tweet result type
     interface AnalysisTweet {
       id?: string;
@@ -247,47 +242,47 @@ export const twitterAnalysisTool = createTool({
       relevanceScore: number;
       snippet: string;
     }
-    
+
     // Process protocol tweets
     const allProtocolResults: Record<string, AnalysisTweet[]> = {};
     const allTweets: AnalysisTweet[] = [];
     const protocolScores: Record<string, number[]> = {};
-    
+
     try {
       // Get protocol tweets and maybe add account-specific tweets
       const protocolsToFetch = [...protocols];
-      
+
       // If accounts are specified, add them as search items too
       if (includeAccounts && includeAccounts.length > 0) {
         for (const account of includeAccounts) {
           try {
             const accountTweets = await getTweetsFromAccount(account, tweetsPerProtocol, scraper);
-            
+
             // Associate these tweets with the most relevant protocol
             for (const tweet of accountTweets) {
               // Find most relevant protocol for this tweet
               let bestProtocol = protocols[0];
               let bestScore = 0;
-              
+
               for (const protocol of protocols) {
                 // Simple relevance calculation - how many times the protocol is mentioned
                 const protocolRegex = new RegExp(protocol, 'gi');
                 const matches = (tweet.text || '').match(protocolRegex) || [];
                 const score = matches.length;
-                
+
                 if (score > bestScore) {
                   bestScore = score;
                   bestProtocol = protocol;
                 }
               }
-              
+
               // Only include tweets that mention at least one protocol
               if (bestScore > 0) {
                 // Filter by likes if specified
                 if (minLikes !== undefined && (tweet.likes || 0) < minLikes) {
                   continue;
                 }
-                
+
                 // Create analysis tweet object
                 const text = tweet.text || '';
                 const analysisTweet: AnalysisTweet = {
@@ -301,15 +296,15 @@ export const twitterAnalysisTool = createTool({
                   relevanceScore: bestScore,
                   snippet: `${text.substring(0, 80)}${text.length > 80 ? '...' : ''}`
                 };
-                
+
                 // Add to results
                 if (!allProtocolResults[bestProtocol]) {
                   allProtocolResults[bestProtocol] = [];
                 }
-                
+
                 allProtocolResults[bestProtocol].push(analysisTweet);
                 allTweets.push(analysisTweet);
-                
+
                 // Track scores for average calculation
                 if (!protocolScores[bestProtocol]) {
                   protocolScores[bestProtocol] = [];
@@ -322,16 +317,16 @@ export const twitterAnalysisTool = createTool({
           }
         }
       }
-      
+
       // Get the main protocol tweets
       const protocolResults = await getProtocolTweets(protocolsToFetch, tweetsPerProtocol, scraper);
-      
+
       // Process the results
       for (const [protocol, tweets] of Object.entries(protocolResults)) {
         // Filter by likes if needed
-        const filteredTweets = minLikes !== undefined ? 
+        const filteredTweets = minLikes !== undefined ?
           tweets.filter(tweet => (tweet.likes || 0) >= minLikes) : tweets;
-        
+
         // Format results
         const analysisTweets = filteredTweets.map(tweet => {
           const text = tweet.text || '';
@@ -346,30 +341,30 @@ export const twitterAnalysisTool = createTool({
             relevanceScore: tweet.relevanceScore,
             snippet: `${text.substring(0, 80)}${text.length > 80 ? '...' : ''}`
           };
-          
+
           // Track scores for average calculation
           if (!protocolScores[protocol]) {
             protocolScores[protocol] = [];
           }
           protocolScores[protocol].push(tweet.relevanceScore);
-          
+
           return analysisTweet;
         });
-        
+
         // Add to results
         if (!allProtocolResults[protocol]) {
           allProtocolResults[protocol] = [];
         }
-        
+
         allProtocolResults[protocol] = [
           ...allProtocolResults[protocol],
           ...analysisTweets
         ];
-        
+
         // Add to all tweets array
         allTweets.push(...analysisTweets);
       }
-      
+
       // Get top tweets by relevance score
       const topTweets = [...allTweets]
         .sort((a, b) => b.relevanceScore - a.relevanceScore)
@@ -380,7 +375,7 @@ export const twitterAnalysisTool = createTool({
           relevanceScore: tweet.relevanceScore,
           snippet: tweet.snippet
         }));
-      
+
       // Calculate average scores by protocol
       const averageScores: Record<string, number> = {};
       for (const [protocol, scores] of Object.entries(protocolScores)) {
@@ -391,18 +386,18 @@ export const twitterAnalysisTool = createTool({
           averageScores[protocol] = 0;
         }
       }
-      
+
       // Determine most active protocol
       let mostActive = protocols[0];
       let highestAvg = 0;
-      
+
       for (const [protocol, avg] of Object.entries(averageScores)) {
         if (avg > highestAvg) {
           highestAvg = avg;
           mostActive = protocol;
         }
       }
-      
+
       // Return formatted results
       return {
         results: allProtocolResults,
@@ -412,10 +407,10 @@ export const twitterAnalysisTool = createTool({
           averageScores
         }
       };
-      
+
     } catch (error) {
       console.error('Error analyzing tweets for protocols: %s', error);
-      
+
       // Return empty results in case of error
       return {
         results: {},

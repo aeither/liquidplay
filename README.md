@@ -57,3 +57,50 @@ flowchart TD
 - **AI Features**: AI SDK for OpenAI and Groq integrations
 - **Styling**: Tailwind CSS
 - **Development**: TypeScript, Bun
+
+## Roadmap
+
+```mermaid
+flowchart TB
+    Start[Current State] --> Phase1[Phase 1: Core Platform]
+    Phase1 --> Phase2[Phase 2: NFT Achievement System]
+    Phase2 --> Phase3A[Phase 3A: Interactive Quests]
+    Phase2 --> Phase3B[Phase 3B: Seasonal Leaderboards]
+    Phase3A --> Phase4A[Phase 4A: Educational Gamification]
+    Phase3B --> Phase4B[Phase 4B: DAO Governance Launch]
+    
+    style Start fill:#22c55e20,stroke:#22c55e,color:#22c55e
+    style Phase1 fill:#22c55e20,stroke:#22c55e,color:#22c55e
+    style Phase2 fill:#f59e0b20,stroke:#f59e0b,color:#f59e0b
+    style Phase3A fill:#3b82f620,stroke:#3b82f6,color:#3b82f6
+    style Phase3B fill:#3b82f620,stroke:#3b82f6,color:#3b82f6
+    style Phase4A fill:#ec489920,stroke:#ec4899,color:#ec4899
+    style Phase4B fill:#ec489920,stroke:#ec4899,color:#ec4899
+```
+
+### Upcoming Features
+
+1. **NFT Achievement System**
+   - Earn unique NFTs for completing specific protocol interactions
+   - Tiered achievement system with rare collectibles
+   - Showcase achievements in user profiles
+
+2. **Interactive Quests**
+   - Time-limited protocol interaction challenges
+   - Multi-step quests requiring various DeFi actions
+   - Special rewards for quest completion
+
+3. **Seasonal Leaderboards**
+   - Quarterly competitive seasons with reset rankings
+   - Season-specific rewards and bonuses
+   - Special themes based on Aptos ecosystem developments
+
+4. **Educational Gamification**
+   - Learn-to-earn mechanics for DeFi knowledge
+   - Interactive tutorials with XP rewards
+   - Protocol deep-dives with quiz challenges
+
+5. **DAO Governance Launch**
+   - Community voting on future features
+   - Protocol multiplier governance
+   - Treasury management for platform rewards

@@ -1,363 +1,243 @@
-// Import from local types file and auth module
+import { type Scraper, SearchMode, type Tweet } from 'agent-twitter-client';
 import { getScraper } from './auth';
-import type { GetTweetsOptions, Scraper, Tweet, TweetSearchOptions } from './types';
 
-// Export interfaces for use by tools
+/**
+ * Extended Tweet type with protocol relevance information
+ */
 export interface ProtocolTweet extends Tweet {
-  protocol: string;
   relevanceScore: number;
+  protocol: string;
+  source: string;
 }
 
 /**
- * Get tweets from a specific Twitter account
- * @param username Twitter username without the @ symbol
- * @param limit Maximum number of tweets to retrieve
+ * Get tweets from a specific account
+ * @param account Twitter account handle (without @)
+ * @param limit Maximum number of tweets to fetch
  * @param scraper Optional authenticated scraper instance
  * @returns Array of tweets
  */
 export async function getTweetsFromAccount(
-  username: string,
-  limit: number,
+  account: string,
+  limit = 10,
   scraper?: Scraper
 ): Promise<Tweet[]> {
-  // Create a scraper if one wasn't provided
-  const twitterScraper = scraper || await getScraper();
-  
+  const tweets: Tweet[] = [];
+
+  // Get a scraper instance if not provided
+  const twitterClient = scraper || await getScraper();
+
   try {
-    // Remove @ if it was included in the username
-    const cleanUsername = username.replace(/^@/, '');
-    
-    // Pass limit as a GetTweetsOptions object to avoid type issues
-    const options: GetTweetsOptions = { limit };
-    // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
-    const tweetGenerator = await twitterScraper.getTweets(cleanUsername, options);
-    
-    // Handle generator to array conversion
-    const tweets: Tweet[] = [];
-    let count = 0;
-    
-    for await (const tweet of tweetGenerator) {
-      tweets.push(tweet as unknown as Tweet);
-      count++;
-      
-      if (count >= limit) {
-        break;
-      }
+    console.log(`Fetching tweets from @${account}...`);
+
+    // Fetch tweets using the generator
+    for await (const tweet of twitterClient.getTweets(account, limit)) {
+      tweets.push(tweet);
+
+      if (tweets.length >= limit) break;
     }
-    
+
     return tweets;
   } catch (error) {
-    console.error(`Error getting tweets from @${username}:`, error);
-    return [];
+    console.error(`Error fetching tweets from @${account}:`, error);
+    throw error;
   }
 }
 
 /**
- * Interface for search options
- */
-interface SearchOptions {
-  limit: number;
-  includeReplies?: boolean;
-}
-
-/**
- * Search for tweets matching a query
+ * Search for tweets by keyword or phrase
  * @param query Search query
- * @param options Search options (limit, includeReplies)
+ * @param options Search options
  * @param scraper Optional authenticated scraper instance
- * @returns Array of matching tweets
+ * @returns Array of tweets matching the search
  */
 export async function searchTweets(
   query: string,
-  options: SearchOptions = { limit: 10 },
+  options: {
+    limit?: number;
+    mode?: SearchMode;
+    minLikes?: number;
+    minRetweets?: number;
+    minReplies?: number;
+  } = {},
   scraper?: Scraper
 ): Promise<Tweet[]> {
-  // Create a scraper if one wasn't provided
-  const twitterScraper = scraper || await getScraper();
-  const { limit, includeReplies = false } = options;
-  
+  const {
+    limit = 20,
+    mode = SearchMode.Latest,
+    minLikes = 0,
+    minReplies = 0,
+    minRetweets = 0
+  } = options;
+
+  const tweets: Tweet[] = [];
+
+  // Get a scraper instance if not provided
+  const twitterClient = scraper || await getScraper();
+
   try {
-    // Here we need to handle the fact that the library may have different method signatures
-    // than our interface
-    try {
-      // Try using the search method if it exists
-      if ('search' in twitterScraper) {
-        // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
-        const tweetGenerator = await twitterScraper.search(query, { includeReplies });
-        
-        // Handle generator to array conversion
-        const tweets: Tweet[] = [];
-        let count = 0;
-        
-        for await (const tweet of tweetGenerator) {
-          tweets.push(tweet as unknown as Tweet);
-          count++;
-          
-          if (count >= limit) {
-            break;
-          }
-        }
-        
-        return tweets;
+    console.log(`Searching for tweets with query: "${query}"...`);
+
+    // Fetch tweets using the generator
+    for await (const tweet of twitterClient.searchTweets(query, mode)) {
+      // Apply filters
+      if (
+        (tweet.likes || 0) < minLikes ||
+        (tweet.retweets || 0) < minRetweets ||
+        (tweet.replies || 0) < minReplies
+      ) {
+        continue;
       }
-      
-      throw new Error('Search method not available');
-    } catch (methodError) {
-      // Fallback to getTweets if search doesn't exist
-      console.log('Search method not available, falling back to getTweets');
-      const options: GetTweetsOptions = { limit };
-      // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
-      const tweetGenerator = await twitterScraper.getTweets(query, options);
-      
-      // Handle generator to array conversion
-      const tweets: Tweet[] = [];
-      let count = 0;
-      
-      for await (const tweet of tweetGenerator) {
-        tweets.push(tweet as unknown as Tweet);
-        count++;
-        
-        if (count >= limit) {
-          break;
-        }
-      }
-      
-      return tweets;
+
+      tweets.push(tweet);
+
+      if (tweets.length >= limit) break;
     }
+    console.log(`Found ${tweets.length} tweets for query: "${query}"`, tweets);
+
+    return tweets;
   } catch (error) {
-    console.error(`Error searching for "${query}":`, error);
-    return [];
+    console.error(`Error searching for tweets with query "${query}":`, error);
+    throw error;
   }
 }
 
 /**
- * Search Twitter for specific query
- * @param query Search query
- * @param limit Maximum number of tweets to fetch
- * @param includeReplies Whether to include replies in search results
- * @param scraper An authenticated Twitter scraper
- * @returns Array of tweets
- */
-export async function searchTwitter(
-  query: string,
-  limit = 20,
-  includeReplies = false,
-  scraper?: Scraper
-): Promise<Tweet[]> {
-  // Create a scraper if one wasn't provided
-  const twitterScraper = scraper || await getScraper();
-  
-  try {
-    // Handle format issues with the query, e.g., convert hashtags or mentions
-    const cleanQuery = query.trim();
-    
-    // Twitter client API types don't always match what we need
-    // The search method may not exist in the client library implementation
-    try {
-      // Try using the search method if it exists
-      // @ts-ignore - We need to ignore property check because search is optional
-      if ('search' in twitterScraper) {
-        // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
-        const tweetGenerator = await twitterScraper.search(query, { includeReplies });
-        
-        // Handle generator to array conversion
-        const tweets: Tweet[] = [];
-        let count = 0;
-        
-        for await (const tweet of tweetGenerator) {
-          // Add isVerified property if missing
-          const rawTweet = tweet as Partial<Tweet>;
-          const processedTweet: Tweet = {
-            ...rawTweet as Tweet,
-            isVerified: rawTweet.isVerified ?? false
-          };
-          tweets.push(processedTweet);
-          count++;
-          
-          if (count >= limit) {
-            break;
-          }
-        }
-        
-        return tweets;
-      }
-      
-      throw new Error('Search method not available');
-    } catch (error) {
-      // Fallback to getTweets if search doesn't exist
-      console.log('Search method not available, falling back to getTweets');
-      // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
-      const tweetGenerator = await twitterScraper.getTweets(query, limit);
-      
-      const tweets: Tweet[] = [];
-      let count = 0;
-      
-      for await (const tweet of tweetGenerator) {
-        // Add isVerified property if missing
-        const rawTweet = tweet as Partial<Tweet>;
-        const processedTweet: Tweet = {
-          ...rawTweet as Tweet,
-          isVerified: rawTweet.isVerified ?? false
-        };
-        tweets.push(processedTweet);
-        count++;
-        
-        if (count >= limit) {
-          break;
-        }
-      }
-      
-      return tweets;
-    }
-  } catch (error) {
-    console.error(`Error searching Twitter for ${query}:`, error);
-    return [];
-  }
-}
-
-/**
- * Calculate relevance score for a tweet relative to a protocol
- * Simple scoring based on occurrences and other factors
- */
-function calculateRelevanceScore(tweet: Tweet, protocol: string): number {
-  const text = tweet.text?.toLowerCase() || '';
-  const protocol_lc = protocol.toLowerCase();
-  
-  // Basic factors for scoring
-  let score = 0;
-  
-  // Protocol mentions in text (weighted highest)
-  const protocolMentions = (text.match(new RegExp(protocol_lc, 'gi')) || []).length;
-  score += protocolMentions * 3;
-  
-  // Handle edge case where protocol isn't mentioned but tweet might still be relevant
-  if (protocolMentions === 0) {
-    // Look for related terms based on protocol
-    const relatedTerms: Record<string, string[]> = {
-      'joule': ['lending', 'borrow', 'jlp', 'liquidity', 'yield', 'pool', 'finance', 'apy', 'aptos'],
-      'thala': ['dex', 'swap', 'thl', 'mov', 'mod', 'stablecoin', 'liquidity', 'pool', 'aptos'],
-      'liquidswap': ['dex', 'swap', 'liquidity', 'trading', 'lp', 'pool', 'aptos'],
-      'tortuga': ['staking', 'stake', 'liquid staking', 'tus', 'aptos'],
-      'amnis': ['staking', 'stake', 'yield', 'aptos'],
-      'aries': ['lending', 'borrow', 'apy', 'markets', 'collateral', 'aptos'],
-      'aptin': ['dex', 'swap', 'perpetual', 'trading', 'perps', 'futures', 'aptos']
-    };
-    
-    // Check for related terms
-    const terms = relatedTerms[protocol_lc] || [];
-    for (const term of terms) {
-      if (text.includes(term.toLowerCase())) {
-        score += 0.5;
-      }
-    }
-  }
-  
-  // Engagement factors (likes, replies, retweets)
-  if (tweet.likes) score += Math.min(tweet.likes / 100, 1);
-  if (tweet.retweets) score += Math.min(tweet.retweets / 50, 1);
-  if (tweet.replies) score += Math.min(tweet.replies / 20, 1);
-  
-  // Verified accounts get a small boost
-  if (tweet.isVerified) score += 0.5;
-  
-  // Recency factor (tweets in the last 24 hours get a boost)
-  const tweetTime = tweet.timeParsed ? new Date(tweet.timeParsed).getTime() : 0;
-  const now = Date.now();
-  const hoursAgo = (now - tweetTime) / (1000 * 60 * 60);
-  if (hoursAgo < 24) {
-    score += 1 - (hoursAgo / 24); // More recent = higher score
-  }
-  
-  return score;
-}
-
-/**
- * Get tweets related to specific protocols
- * @param protocols Array of protocol names
- * @param tweetsPerProtocol Number of tweets to fetch per protocol
- * @param scraper An authenticated Twitter scraper
- * @returns Object with protocol names as keys and arrays of protocol tweets as values
+ * Get tweets related to Aptos protocols
+ * @param protocols List of protocol names to fetch tweets for
+ * @param limit Maximum number of tweets per protocol
+ * @param scraper Optional authenticated scraper instance
+ * @returns Map of protocol names to their tweets
  */
 export async function getProtocolTweets(
   protocols: string[],
-  tweetsPerProtocol = 3,
-  providedScraper?: Scraper
+  limit = 10,
+  scraper?: Scraper
 ): Promise<Record<string, ProtocolTweet[]>> {
-  const scraper = providedScraper || await getScraper();
-  const result: Record<string, ProtocolTweet[]> = {};
-  
+  // Protocol Twitter accounts mapping (handle → protocol name)
+  const protocolAccounts: Record<string, string> = {
+    'JouleFinance': 'Joule',
+    'AmnisProtocol': 'Amnis',
+    'ThalaLabs': 'Thala',
+    'Econia': 'Echelon',
+    'LiquidswapDEX': 'LiquidSwap',
+    'PanoraFi': 'Panora',
+    'AriesMarkets': 'Aries',
+    'EchoLabs_XYZ': 'Echo',
+    'AptosLabs': 'Aptos',
+    'AptosFDN': 'Aptos',
+  };
+
+  // Initialize result object
+  const protocolTweets: Record<string, ProtocolTweet[]> = {};
+
+  // Get a scraper instance if not provided
+  const twitterClient = scraper || await getScraper();
+
+  // Initialize all protocols with empty arrays
   for (const protocol of protocols) {
+    protocolTweets[protocol] = [];
+  }
+
+  // Process each protocol account
+  for (const [handle, protocolName] of Object.entries(protocolAccounts)) {
+    // Skip if not in requested protocols
+    if (!protocols.includes(protocolName)) continue;
+
     try {
-      // Search for tweets related to the protocol
-      const searchQuery = `${protocol} blockchain`;
-      let tweets: Tweet[] = [];
-      
-      try {
-        // Try using the search method if it exists
-        if ('search' in scraper) {
-          // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
-          const tweetGenerator = await scraper.search(searchQuery, { 
-            limit: tweetsPerProtocol * 3 // Get a larger sample to filter from
-          });
-          
-          // Handle generator to array conversion
-          for await (const tweet of tweetGenerator) {
-            // Add isVerified property if missing
-            const rawTweet = tweet as Partial<Tweet>;
-            const processedTweet: Tweet = {
-              ...rawTweet as Tweet,
-              isVerified: rawTweet.isVerified ?? false
-            };
-            tweets.push(processedTweet);
-          }
-        } else {
-          throw new Error('Search method not available');
-        }
-      } catch (error) {
-        // Fallback to getTweets if search doesn't exist
-        console.log('Search method not available, falling back to getTweets');
-        // @ts-ignore - We need to ignore type mismatch here as we're adapting two different interfaces
-        const tweetGenerator = await scraper.getTweets(protocol, tweetsPerProtocol * 2);
-        
-        // Handle generator to array conversion
-        tweets = [];  // Reset tweets array
-        for await (const tweet of tweetGenerator) {
-          // Add isVerified property if missing
-          const rawTweet = tweet as Partial<Tweet>;
-          const processedTweet: Tweet = {
-            ...rawTweet as Tweet,
-            isVerified: rawTweet.isVerified ?? false
-          };
-          tweets.push(processedTweet);
-        }
+      const tweets = await getTweetsFromAccount(handle, limit, twitterClient);
+
+      // Add source info and convert to ProtocolTweet
+      for (const tweet of tweets) {
+        protocolTweets[protocolName].push({
+          ...tweet,
+          protocol: protocolName,
+          source: handle,
+          relevanceScore: calculateRelevanceScore(tweet, protocolName),
+        });
       }
-      
-      // Calculate relevance scores for each tweet
-      const protocolTweets = tweets.map(tweet => ({
-        ...tweet,
-        protocol,
-        relevanceScore: calculateRelevanceScore(tweet, protocol)
-      }));
-      
-      // Sort by relevance
-      const sortedTweets = protocolTweets.sort((a, b) => b.relevanceScore - a.relevanceScore);
-      
-      // Limit to requested number of tweets
-      const limitedTweets = sortedTweets.slice(0, tweetsPerProtocol);
-      
-      result[protocol] = limitedTweets;
     } catch (error) {
-      console.error(`Error fetching tweets for protocol ${protocol}:`, error);
-      result[protocol] = [];
+      console.error(`Error fetching tweets for ${protocolName} (@${handle}):`, error);
+      // Continue with other accounts
     }
   }
-  
-  return result;
+
+  // Also search for protocol mentions
+  for (const protocol of protocols) {
+    try {
+      // Search for mentions of the protocol
+      const searchQuery = `${protocol} (aptos OR defi OR web3) -is:retweet`;
+      const mentionTweets = await searchTweets(
+        searchQuery,
+        { limit: limit, minLikes: 5 },
+        twitterClient
+      );
+
+      // Add source info and convert to ProtocolTweet
+      for (const tweet of mentionTweets) {
+        // Skip if from official account (already included)
+        if (tweet.username && Object.entries(protocolAccounts).some(([handle, proto]) =>
+          proto === protocol && handle.toLowerCase() === tweet.username?.toLowerCase())) {
+          continue;
+        }
+
+        protocolTweets[protocol].push({
+          ...tweet,
+          protocol,
+          source: 'mention',
+          relevanceScore: calculateRelevanceScore(tweet, protocol),
+        });
+      }
+    } catch (error) {
+      console.error(`Error searching for ${protocol} mentions:`, error);
+      // Continue with other protocols
+    }
+  }
+
+  // Sort by relevance score and limit the results
+  for (const protocol of protocols) {
+    protocolTweets[protocol] = protocolTweets[protocol]
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, limit);
+  }
+
+  return protocolTweets;
 }
 
-// Export auth functions
-export { getScraper, isAuthenticated } from './auth';
+/**
+ * Calculate a relevance score for a tweet based on its relation to a protocol
+ * 
+ * @param tweet Tweet object to analyze
+ * @param protocol Protocol name to score against
+ * @returns Numerical score representing relevance
+ */
+function calculateRelevanceScore(tweet: Tweet, protocol: string): number {
+  const tweetText = tweet.text?.toLowerCase() || '';
+  const protocolLower = protocol.toLowerCase();
+  let score = 0;
 
-// Export types
-export type { GetTweetsOptions, Scraper, Tweet, TweetSearchOptions };
+  // Basic matching (protocol name appears in tweet)
+  if (tweetText.includes(protocolLower)) {
+    score += 5;
 
+    // Protocol name in hashtag form
+    if (tweetText.includes(`#${protocolLower}`)) {
+      score += 2;
+    }
+
+    // Protocol name at beginning of tweet
+    if (tweetText.startsWith(protocolLower) || tweetText.startsWith(`#${protocolLower}`)) {
+      score += 1;
+    }
+  }
+
+  // Engagement metrics boost relevance
+  const likes = tweet.likes || 0;
+  const retweets = tweet.retweets || 0;
+
+  // Add weighted engagement metrics
+  score += (likes / 100) + (retweets / 20);
+
+  // Limit to 10 max
+  return Math.min(score, 10);
+}

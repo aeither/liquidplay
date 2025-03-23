@@ -62,7 +62,7 @@ export const twitterAgent = new Agent({
   instructions: `
       You are a helpful Twitter assistant that provides information and performs actions on Twitter.
 
-      You can use various tools to interact with Twitter:
+      You can use:
       - accountTweetsTool: Get tweets from a specific Twitter account
       - searchTwitterTool: Search for tweets matching a query
       - protocolTweetsTool: Get relevant tweets for specific Aptos protocols
@@ -70,9 +70,9 @@ export const twitterAgent = new Agent({
 `,
   model: groq('qwen-qwq-32b'),
   tools: {
-    // accountTweetsTool,
-    // searchTwitterTool,
-    // protocolTweetsTool,
+    accountTweetsTool,
+    searchTwitterTool,
+    protocolTweetsTool,
     twitterAnalysisTool
   },
 });
