@@ -12,6 +12,7 @@ import {
   twitterAnalysisTool,
   withdrawAriesTokensTool
 } from '../tools';
+import { showProfileTool } from '../tools/uiTool';
 
 export const moveAgent = new Agent({
   name: 'Move Agent',
@@ -74,8 +75,23 @@ export const twitterAgent = new Agent({
   },
 });
 
+export const showProfileAgent = new Agent({
+  name: 'Show Profile Agent',
+  instructions: `
+      You are a helpful Twitter assistant that provides information and performs actions on Twitter.
+
+      You can use various tools to interact with Twitter:
+      - showProfileTool: Show User Profile UI
+  `,
+  model: groq('qwen-qwq-32b'),
+  tools: {
+    showProfileTool
+  },
+});
+
 // Export all agents from this file
 export const agents = {
   moveAgent,
   twitterAgent,
-  };
+  showProfileAgent
+};

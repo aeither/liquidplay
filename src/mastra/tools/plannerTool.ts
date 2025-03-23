@@ -1,1 +1,0 @@
-// this tools is going to be used to return a string 

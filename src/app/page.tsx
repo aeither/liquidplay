@@ -2,7 +2,7 @@
 
 import { Thread } from "@/components/assistant-ui/thread";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
-import { WebSearchToolUI } from "@/tools/WebSearchToolUI";
+import { ShowProfileToolUI } from "@/ui-tools/ShowProfileToolUI";
 import {
   AssistantRuntimeProvider,
   CompositeAttachmentAdapter,
@@ -48,7 +48,7 @@ export default function MyApp() {
               </div>
             </div>
             <div className="bg-gray-900 p-3 rounded-md border-2 border-green-500 shadow-[0_0_10px_#22c55e] flex-shrink-0">
-              <WebSearchToolUI />
+              <ShowProfileToolUI />
             </div>
           </div>
         </div>

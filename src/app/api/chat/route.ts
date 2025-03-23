@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const { object } = await generateObject({
     model: groq('qwen-qwq-32b'),
     output: 'enum',
-    enum: ['game', 'twitter', 'move', 'knowledge'],
+    enum: ['game', 'twitter', 'move', 'show'],
     prompt: lastUserMessage,
     system: `You are a planning assistant that determines which specialized agent would be most helpful for a user's query.
     
@@ -31,13 +31,13 @@ export async function POST(req: Request) {
       * Interacting with Thala protocol
       * Checking wallet balances
       * Creating protocol profiles
-    
-    - "knowledge": For general information requests such as:
-      * Learning about blockchain concepts
-      * Getting explanations about protocols
-      * Finding documentation or resources
-      * Understanding how things work
-    
+
+    - "show": For UI display requests such as:
+      * Showing user profile information
+      * Displaying UI components
+      * Rendering interface elements
+      * Presenting visual information to users
+
     - "game": For game-related requests such as:
       * Starting a game
       * Playing an interactive game
@@ -54,11 +54,11 @@ export async function POST(req: Request) {
     const stream = await myAgent.stream(messages);
     return stream.toDataStreamResponse({ sendReasoning: false });
   }
-  // if (object === 'knowledge') {
-  //   const myAgent = mastra.getAgent('knowledgeAgent');
-  //   const stream = await myAgent.stream(messages);
-  //   return stream.toDataStreamResponse({ sendReasoning: false });
-  // }
+  if (object === 'show') {
+    const myAgent = mastra.getAgent('showProfileAgent');
+    const stream = await myAgent.stream(messages);
+    return stream.toDataStreamResponse({ sendReasoning: false });
+  }
   if (object === 'twitter') {
     const myAgent = mastra.getAgent('twitterAgent');
     const stream = await myAgent.stream(messages);
