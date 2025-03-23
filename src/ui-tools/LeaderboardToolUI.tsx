@@ -21,11 +21,13 @@ export const LeaderboardToolUI = makeAssistantToolUI<
 	render: ({ args, status, result }) => {
 		// Loading state
 		if (status.type === "running") {
+			const loadingItems = Array.from({ length: args.limit || 5 }, (_, i) => i);
+			
 			return (
 				<div className="animate-pulse bg-white dark:bg-gray-800 rounded-lg shadow p-4 max-w-full">
 					<div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4" />
-					{[...Array(args.limit || 5)].map((_, i) => (
-						<div key={i} className="flex items-center mb-3">
+					{loadingItems.map((item) => (
+						<div key={`loading-item-${item}`} className="flex items-center mb-3">
 							<div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full mr-3" />
 							<div className="flex-1">
 								<div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
@@ -124,7 +126,7 @@ export const LeaderboardToolUI = makeAssistantToolUI<
 					<div className="flex">
 						<div className="flex-shrink-0">
 							{/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
-<svg
+							<svg
 								className="h-5 w-5 text-red-500"
 								viewBox="0 0 20 20"
 								fill="currentColor"

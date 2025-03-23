@@ -18,12 +18,14 @@ export const ProtocolsBoostToolUI = makeAssistantToolUI<
 	render: ({ status, result }) => {
 		// Loading state
 		if (status.type === "running") {
+			const loadingItems = Array.from({ length: 5 }, (_, i) => i);
+			
 			return (
 				<div className="animate-pulse bg-white dark:bg-gray-800 rounded-lg shadow p-4 max-w-full">
 					<div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4" />
-					{[...Array(5)].map((_, i) => (
+					{loadingItems.map((item) => (
 						<div
-							key={i}
+							key={`loading-protocol-${item}`}
 							className="flex items-center justify-between mb-3 py-2 border-b border-gray-100 dark:border-gray-700"
 						>
 							<div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
