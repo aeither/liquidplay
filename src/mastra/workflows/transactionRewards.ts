@@ -1,11 +1,8 @@
-import { db } from '@/lib/db/drizzle';
-import { boosts } from '@/lib/db/schema';
 import { getWalletBalance } from '@/lib/move';
 import { groq } from '@ai-sdk/groq';
 import { createTool } from '@mastra/core';
 import { Agent } from '@mastra/core/agent';
 import { Step, Workflow } from '@mastra/core/workflows';
-import { eq } from 'drizzle-orm';
 import { parseUnits } from 'viem';
 import { z } from 'zod';
 import { getAllProtocolsTool, upsertUserTool } from '../tools/db';
