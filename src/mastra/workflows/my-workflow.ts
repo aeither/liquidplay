@@ -23,6 +23,23 @@ const stepOne = new Step({
         return { doubledValue };
     },
 });
+const stepTwo = new Step({
+    id: 'stepTwo',
+    inputSchema: z.object({
+        doubledValue: z.number(),
+    }),
+    outputSchema: z.object({
+        tripledValue: z.number(),
+    }),
+    execute: async ({ context }) => {
+        console.log("🚀 ~ execute: ~ context:", context.getStepResult("stepOne"))
+        const { doubledValue } = context.getStepResult("stepOne")
+        const tripledValue = doubledValue * 3;
+        return { tripledValue };
+    },
+});
 
 // Link steps and commit workflow
-myWorkflow.step(stepOne).commit();
+myWorkflow.step(stepOne).then(stepTwo).commit();
+
+export { myWorkflow };

@@ -5,6 +5,7 @@ import {
   balanceTool,
   borrowAriesTokensTool,
   createAriesProfileTool,
+  formatRequestTool,
   getAllProtocolsTool,
   getLeaderboardTool,
   lendAriesTokensTool,

@@ -50,9 +50,16 @@ export async function POST(req: Request) {
   console.log('plan: ', object);
 
   if (object === 'move') {
+    const workflow = mastra.getWorkflow("transactionRewardsWorkflow");
+    const { start } = await workflow.createRun({});
+    const result = await start({ triggerData: { requestString: lastUserMessage } })
+    if (result.results['parse-transaction-request'].status !== 'success') {
+      throw new Error('Failed to parse transaction request');
+    }
+    const formattedRequest = result.results['parse-transaction-request'].output?.formattedRequest as string;
 
     const myAgent = mastra.getAgent('moveAgent');
-    const stream = await myAgent.stream(messages);
+    const stream = await myAgent.stream(formattedRequest);
     return stream.toDataStreamResponse({ sendReasoning: false });
   }
   if (object === 'show') {
