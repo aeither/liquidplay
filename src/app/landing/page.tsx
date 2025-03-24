@@ -7,11 +7,11 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "LiquidPlay | Gamified Liquidity Experience",
-  description: "A gamified liquidity game using Twitter to fetch posts from Aptos protocols. Get scores and boost XP by interacting with protocols.",
-  keywords: ["LiquidPlay", "aptos", "liquidity game", "crypto game", "protocols", "XP boost"],
+  description: "A gamified liquidity game using Twitter to fetch posts from Aptos protocols. Get scores and boost points by interacting with protocols.",
+  keywords: ["LiquidPlay", "aptos", "liquidity game", "crypto game", "protocols", "points boost"],
   openGraph: {
     title: "LiquidPlay | Gamified Liquidity Experience",
-    description: "A gamified liquidity game. Interact with Aptos protocols to earn XP and climb the leaderboard.",
+    description: "A gamified liquidity game. Interact with Aptos protocols to earn points and climb the leaderboard.",
     type: "website",
   },
 };
@@ -26,7 +26,7 @@ export default function LandingPage() {
 
         <div className="inline-block border-2 border-green-500 p-6 shadow-[0_0_10px_#22c55e] bg-gray-900 mb-10 max-w-3xl w-full">
           <p className="mb-6 typing-effect text-sm md:text-base">INITIALIZING PROTOCOL DATABASE...</p>
-          <p className="mb-6 text-sm md:text-base">GAMIFIED LIQUIDITY EXPERIENCE. EARN XP. CLIMB THE LEADERBOARD.</p>
+          <p className="mb-6 text-sm md:text-base">GAMIFIED LIQUIDITY EXPERIENCE. EARN POINTS. CLIMB THE LEADERBOARD.</p>
           <p className="mb-8 text-sm md:text-base">
             INTERACT WITH APTOS PROTOCOLS TO BOOST YOUR MULTIPLIERS
           </p>
