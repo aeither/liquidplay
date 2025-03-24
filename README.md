@@ -16,6 +16,40 @@ LiquidPlay creates a gamified experience for blockchain users. By fetching and a
 
 Users can view their profile, check the leaderboard to see where they rank among other players, and see which protocols currently offer XP boosts for interactions.
 
+## Problem
+
+### Complexity of DeFi Interactions
+Many users find interacting with DeFi protocols complex and intimidating. LiquidPlay addresses this by:
+- Providing a gamified interface that makes DeFi interactions more approachable and engaging
+- Offering a unified terminal where users can interact with multiple protocols in one place
+- Using AI to simplify and guide users through complex blockchain transactions
+
+### Lack of Engagement and Retention in DeFi
+DeFi platforms often struggle to keep users engaged long-term. LiquidPlay tackles this by:
+- Implementing a points system and global leaderboard to foster competition and regular engagement
+- Offering points boosts for specific protocols, encouraging users to explore different DeFi services
+- Planning future features like NFT achievements and seasonal leaderboards to maintain long-term interest
+
+### Information Overload in the Crypto Space
+Users often find it challenging to keep up with the latest updates from various protocols. LiquidPlay helps by:
+- Aggregating and presenting the most recent and relevant information from major Aptos protocols via their Twitter feeds
+- Using AI to analyze and score the relevance of blockchain-related tweets, helping users focus on what's important
+
+### Educational Barriers in DeFi
+Many potential users are held back by a lack of knowledge about DeFi concepts. LiquidPlay addresses this through:
+- Plans for educational gamification features, including learn-to-earn mechanics and interactive tutorials
+- Rewarding users with XP for learning about DeFi concepts and completing educational quests
+
+### Fragmented User Experience Across Protocols
+Users typically need to navigate multiple websites and interfaces to interact with different protocols. LiquidPlay solves this by:
+- Providing a single terminal interface where users can engage with multiple Aptos protocols
+- Streamlining the process of switching between different DeFi activities like staking, lending, and borrowing
+
+### Lack of Immediate Rewards for DeFi Participation
+Traditional DeFi often has delayed or complex reward structures. LiquidPlay offers:
+- Immediate gratification through points and leaderboard positioning for protocol interactions
+- A clear, gamified reward system that motivates continued participation
+
 ## User Flow
 
 ```mermaid
