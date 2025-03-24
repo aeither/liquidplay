@@ -46,6 +46,8 @@ export const moveAgent = new Agent({
       - searchTwitterTool: Search for tweets matching a query
       - protocolTweetsTool: Get relevant tweets for specific Aptos protocols
       - twitterAnalysisTool: Analyze Twitter activity for blockchain protocols
+
+      When answering back to the user the link to the explorer to verify the tx with the hash. https://explorer.aptoslabs.com/txn/{HASH}?network=mainnet
 `,
   model: groq('qwen-qwq-32b'),
   tools: {

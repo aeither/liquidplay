@@ -37,10 +37,10 @@ async function seed() {
 
   // Seed protocols with multipliers
   const protocolData = [
-    { protocol: "PontemNetwork", multiplier: "1.70" },
-    { protocol: "ThalaLabs", multiplier: "2.66" },
-    { protocol: "JouleFinance", multiplier: "2.87" },
-    { protocol: "AmnisFinance", multiplier: "2.83" }
+    { protocol: "PontemNetwork", multiplier: "6.72" },
+    { protocol: "ThalaLabs", multiplier: "5.55" },
+    { protocol: "JouleFinance", multiplier: "5.43" },
+    { protocol: "AmnisFinance", multiplier: "5.40" }
   ];
 
   for (const protocol of protocolData) {

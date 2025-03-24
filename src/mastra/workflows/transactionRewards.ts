@@ -8,11 +8,11 @@ import { Step, Workflow } from '@mastra/core/workflows';
 import { eq } from 'drizzle-orm';
 import { parseUnits } from 'viem';
 import { z } from 'zod';
-import { getAllProtocolsTool } from '../tools/db';
+import { getAllProtocolsTool, upsertUserTool } from '../tools/db';
 
 const llm = groq('qwen-qwq-32b');
 
-export const formatAmountTool = createTool({
+const formatAmountTool = createTool({
   id: 'format-amount',
   description: 'Format Amount to 8 digits',
   inputSchema: z.object({
@@ -29,7 +29,7 @@ export const formatAmountTool = createTool({
 });
 
 // Tool for checking a wallet's balance
-export const convertTokenNameToAddressTool = createTool({
+const convertTokenNameToAddressTool = createTool({
   id: 'convert-token-name-to-address',
   description: 'Convert token name to token address',
   inputSchema: z.object({
@@ -51,8 +51,7 @@ export const convertTokenNameToAddressTool = createTool({
   },
 });
 
-
-const agent = new Agent({
+const converterAgent = new Agent({
   name: 'Amount Converter Agent',
   model: llm,
   tools: {
@@ -83,12 +82,56 @@ const parseTransactionRequest = new Step({
   execute: async ({ context }) => {
     const requestString = context.triggerData.requestString;
     console.log(`Parsing transaction request: ${requestString}`);
-    const response = await agent.generate(requestString);
+    const response = await converterAgent.generate(requestString);
     console.log(`Parsed: ${response.text}`);
     return {
       formattedRequest: response.text,
     };
   }
+});
+
+
+
+/**
+ * Agent and Tools for Step 2
+ */
+const getAmountWithMultiplierTool = createTool({
+  id: 'format-amount',
+  description: 'Format Amount to 8 digits',
+  inputSchema: z.object({
+    multiplier: z.number().describe('The amount to multiply to')
+  }),
+  outputSchema: z.object({
+    amount: z.number(),
+  }),
+  execute: async ({ context }) => {
+    const basePoint = 5
+    return {
+      amount: context.multiplier * basePoint,
+    }
+  },
+});
+
+const addPointsAgent = new Agent({
+  name: 'Add Point Agent',
+  model: llm,
+  tools: {
+    getAllProtocolsTool,
+    getAmountWithMultiplierTool,
+    upsertUserTool,
+  },
+  instructions: `
+Use Tools to add points to user according to multiplier
+
+use getAllProtocolsTool to get list of protocols with its multipliers
+
+deduce the multiplier by matching from user message mentioned protocol to the list of protocols with multiplier
+use getAmountWithMultiplierTool to calculate the amount to give to the user
+
+use upsertUserTool to update the database with the amount we got from getAmountWithMultiplierTool
+
+answer back with the user address with the final points
+  `
 });
 
 /**
@@ -99,92 +142,16 @@ const awardPoints = new Step({
   id: 'award-points',
   description: 'Award points to the user based on the protocol multiplier',
   inputSchema: z.object({
-    action: z.string(),
-    amount: z.number(),
-    token: z.string(),
-    protocol: z.string(),
-    positionId: z.string()
+    requestString: z.string().describe('The user\'s transaction request string')
   }),
-  execute: async ({ context, mastra }) => {
-    const parsed = context.inputData;
-    const protocol = parsed.protocol;
-    console.log(`Awarding points for transaction with ${protocol}`);
-
-    // 1. Get the user's wallet address
+  execute: async ({ context }) => {
+    const requestString = context.triggerData.requestString;
     const { address } = await getWalletBalance();
-    console.log(`User address: ${address}`);
-
-    // 2. Get the protocol multiplier
-    let multiplier = 1.0;
-
-    // Get the protocol information using getAllProtocolsTool
-    if (protocol && mastra) {
-      try {
-        // Use the tool directly
-        if (getAllProtocolsTool) {
-          const protocolsResult = await getAllProtocolsTool.execute({});
-
-          if (protocolsResult?.protocols) {
-            const protocolData = protocolsResult.protocols.find(
-              (p: { protocol: string; multiplier: string }) =>
-                p.protocol.toLowerCase() === protocol.toLowerCase()
-            );
-
-            if (protocolData?.multiplier) {
-              multiplier = Number.parseFloat(protocolData.multiplier);
-              console.log(`Found multiplier for ${protocol}: ${multiplier}`);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching protocol data:', error);
-
-        // Fallback: directly query the database
-        const boostData = await db
-          .select()
-          .from(boosts)
-          .where(eq(boosts.protocol, protocol));
-
-        if (boostData.length > 0 && boostData[0].multiplier) {
-          multiplier = Number.parseFloat(boostData[0].multiplier);
-          console.log(`Found multiplier from DB for ${protocol}: ${multiplier}`);
-        }
-      }
-    }
-
-    // 3. Calculate points to award (base 20 points * multiplier)
-    const basePoints = 20;
-    const pointsToAward = Math.round(basePoints * multiplier);
-    console.log(`Awarding ${pointsToAward} points (${basePoints} × ${multiplier})`);
-
-    // 4. Update the user's points using upsertUserTool
-    if (mastra) {
-      try {
-        // Get and execute the tool directly
-        const upsertUserTool = mastra.getTool('upsertUserTool');
-        if (upsertUserTool) {
-          const result = await upsertUserTool.execute({
-            address,
-            points: pointsToAward
-          });
-
-          return {
-            success: true,
-            address,
-            pointsAwarded: pointsToAward,
-            multiplier,
-            protocol,
-            userResult: result
-          };
-        }
-        throw new Error('upsertUserTool not found');
-      } catch (error) {
-        console.error('Error updating user points:', error);
-        throw new Error(`Failed to award points: ${error}`);
-      }
-    } else {
-      throw new Error('Mastra instance is required but not available');
-    }
+    const response = await addPointsAgent.generate(`${requestString}. User address: ${address}`);
+    console.log(`Awarded points: ${response.text}`);
+    return {
+      formattedRequest: response.text,
+    };
   }
 });
 
@@ -199,7 +166,7 @@ const transactionRewardsWorkflow = new Workflow({
   }),
 })
   .step(parseTransactionRequest)
-// .then(awardPoints);
+  .then(awardPoints);
 
 // Commit the workflow
 transactionRewardsWorkflow.commit();
