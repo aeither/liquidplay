@@ -1,4 +1,3 @@
-
 <div align="center">
     <img src="https://github.com/user-attachments/assets/7a53df0e-6556-4be3-be02-623da496dd18" alt="Logo" width="400">
 </div>
@@ -109,8 +108,97 @@ flowchart TB
    - Community voting on future features
    - Protocol multiplier governance
    - Treasury management for platform rewards
-## Screenshots
 
+## AI Workflows
+
+LiquidPlay uses advanced AI workflows to provide a seamless experience for users. The system is built using Mastra.ai, leveraging specialized agents and workflows to handle different types of requests.
+
+```mermaid
+graph TD
+    subgraph "User Request Router"
+        A[User Request] --> B{Request Classifier}
+        B -->|Twitter Related| C[Twitter Agent]
+        B -->|Move Protocol| D[Move Workflow]
+        B -->|UI Request| E[Show Profile Agent]
+        B -->|Game Request| F[Game Agent]
+        
+        style B fill:#f9a8d4,stroke:#be185d,color:#be185d
+    end
+    
+    subgraph "Move Workflow"
+        D --> G[Parse Transaction Request]
+        G --> H[Format Request]
+        H --> I[Execute Protocol Action]
+        I --> J[Award Points]
+        J --> K[Update Leaderboard]
+        
+        style D fill:#a5f3fc,stroke:#0e7490,color:#0e7490
+        style G fill:#a5f3fc,stroke:#0e7490,color:#0e7490
+        style H fill:#a5f3fc,stroke:#0e7490,color:#0e7490
+        style I fill:#a5f3fc,stroke:#0e7490,color:#0e7490
+        style J fill:#a5f3fc,stroke:#0e7490,color:#0e7490
+        style K fill:#a5f3fc,stroke:#0e7490,color:#0e7490
+    end
+    
+    subgraph "Twitter Agent"
+        C --> L[Search Tweets]
+        C --> M[Protocol Twitter Analysis]
+        C --> N[Account Tweets]
+        
+        style C fill:#fde68a,stroke:#92400e,color:#92400e
+        style L fill:#fde68a,stroke:#92400e,color:#92400e
+        style M fill:#fde68a,stroke:#92400e,color:#92400e
+        style N fill:#fde68a,stroke:#92400e,color:#92400e
+    end
+    
+    subgraph "Show Profile Agent"
+        E --> O[Display User Profile]
+        E --> P[Show Leaderboard]
+        E --> Q[List Protocols]
+        
+        style E fill:#bfdbfe,stroke:#1e40af,color:#1e40af
+        style O fill:#bfdbfe,stroke:#1e40af,color:#1e40af
+        style P fill:#bfdbfe,stroke:#1e40af,color:#1e40af
+        style Q fill:#bfdbfe,stroke:#1e40af,color:#1e40af
+    end
+```
+
+### AI System Architecture
+
+1. **Request Classification**
+   - All user requests are first analyzed by a classification model
+   - The model determines whether the request is related to Twitter, Move blockchain protocols, UI display, or game features
+   - Based on the classification, the request is routed to the appropriate specialized agent
+
+2. **Specialized Agents**
+   - **Move Agent**: Handles blockchain interactions with Aptos protocols
+     - Staking with Amnis
+     - Lending/borrowing with Aries
+     - Lending with Joule Finance
+     - Wallet balance checks
+     - Reward point calculation
+   
+   - **Twitter Agent**: Manages all Twitter-related requests
+     - Fetching tweets from specific accounts
+     - Searching topics across Twitter
+     - Analyzing protocol-related Twitter activity
+     - Scoring relevance of blockchain tweets
+   
+   - **Show Profile Agent**: Handles UI presentation requests
+     - Displaying user profiles
+     - Showing global leaderboards
+     - Listing available protocols with their multipliers
+
+3. **Transaction Rewards Workflow**
+   - When a user performs a blockchain transaction:
+     1. The request is parsed and formatted for the target protocol
+     2. The transaction is executed on the blockchain
+     3. The system calculates reward points based on protocol multipliers
+     4. Points are awarded to the user and the leaderboard is updated
+
+This AI-powered system creates a seamless experience where users can interact naturally through the terminal, with the appropriate agent handling each request based on its type and purpose.
+
+## Screenshots
 
 ![screenshot1](https://github.com/user-attachments/assets/2931df65-53ad-4413-b67e-a0395a95ecb5)
 ![screenshot2](https://github.com/user-attachments/assets/9e2a8aff-accb-4afb-81bf-9affabeac85e)
