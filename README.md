@@ -1,10 +1,15 @@
+
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/7a53df0e-6556-4be3-be02-623da496dd18" alt="Logo" width="400">
+</div>
+
 # LiquidPlay
 
 **Gamify your liquidity interactions with our AI terminal.**
 
 ## Overview
 
-The LiquidPlay is an open-source project that combines the power of blockchain, social media, and gamification to create a unique user experience. It leverages Twitter to fetch the most recent posts from major Aptos protocols, allowing users to interact with these protocols and earn XP based on their engagement.
+The LiquidPlay is project that combines the power of blockchain, social media, and gamification to create a unique user experience. It leverages Twitter to fetch the most recent posts from major Aptos protocols, allowing users to interact with these protocols and earn XP points based on their engagement.
 
 ## Description
 
@@ -57,3 +62,10 @@ flowchart TD
 - **AI Features**: AI SDK for OpenAI and Groq integrations
 - **Styling**: Tailwind CSS
 - **Development**: TypeScript, Bun
+
+## Screenshots
+
+
+![screenshot1](https://github.com/user-attachments/assets/2931df65-53ad-4413-b67e-a0395a95ecb5)
+![screenshot2](https://github.com/user-attachments/assets/9e2a8aff-accb-4afb-81bf-9affabeac85e)
+![screenshot3](https://github.com/user-attachments/assets/8bb00138-d77d-49a3-a296-5cdf44d6b363)
