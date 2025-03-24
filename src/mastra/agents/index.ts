@@ -32,7 +32,7 @@ export const moveAgent = new Agent({
       - Keep responses concise but informative
 
       You can use various tools to interact with Move protocols:
-      - balanceTool: Check user's wallet balance
+      - balanceTool: Check user's wallet balance in APT
       - stakeAmnisTokensTool: Stake tokens with Amnis protocol
       - createAriesProfileTool: Create an Aries profile
       - lendAriesTokensTool: Lend tokens on Aries protocol 
@@ -48,6 +48,7 @@ export const moveAgent = new Agent({
       - twitterAnalysisTool: Analyze Twitter activity for blockchain protocols
 
       When answering back to the user the link to the explorer to verify the tx with the hash. https://explorer.aptoslabs.com/txn/{HASH}?network=mainnet
+      and answering back the amount in APT not Octas which is 10^8 times the amount.
 `,
   model: groq('qwen-qwq-32b'),
   tools: {

@@ -1,16 +1,16 @@
-import { createTool } from '@mastra/core/tools';
-import { z } from 'zod';
 import {
-    Aptos,
-    AptosConfig,
-    Ed25519PrivateKey,
-    type HexInput,
-    Network,
-    PrivateKey,
-    PrivateKeyVariants,
-    AccountAddress,
+  AccountAddress,
+  Aptos,
+  AptosConfig,
+  Ed25519PrivateKey,
+  type HexInput,
+  Network,
+  PrivateKey,
+  PrivateKeyVariants,
 } from "@aptos-labs/ts-sdk";
+import { createTool } from '@mastra/core/tools';
 import { AgentRuntime, LocalSigner } from "move-agent-kit";
+import { z } from 'zod';
 
 // Create the Aptos config and runtime
 const createAgentRuntime = async (networkName: 'MAINNET' | 'TESTNET' | 'DEVNET' = 'MAINNET') => {
@@ -45,7 +45,7 @@ export const stakeAmnisTokensTool = createTool({
   id: 'stake-amnis-tokens',
   description: 'Stake tokens with Amnis protocol',
   inputSchema: z.object({
-    amount: z.number().positive().describe('Amount of tokens to stake'),
+    amount: z.number().positive().describe('Amount of tokens to stake in Octas'),
     to: z.string().optional().describe('Optional target address for staking'),
     network: z.enum(['MAINNET', 'TESTNET', 'DEVNET']).default('MAINNET').describe('The Aptos network to use'),
   }),
@@ -71,7 +71,7 @@ export const withdrawAmnisTokensTool = createTool({
   id: 'withdraw-amnis-tokens',
   description: 'Withdraw staked tokens from Amnis protocol',
   inputSchema: z.object({
-    amount: z.number().positive().describe('Amount of tokens to withdraw'),
+    amount: z.number().positive().describe('Amount of tokens to withdraw in Octas'),
     to: z.string().optional().describe('Optional target address for withdrawal'),
     network: z.enum(['MAINNET', 'TESTNET', 'DEVNET']).default('MAINNET').describe('The Aptos network to use'),
   }),

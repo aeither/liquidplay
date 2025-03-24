@@ -46,7 +46,7 @@ export const lendJouleFinanceTool = createTool({
   id: 'lend-joule-finance',
   description: 'Lend tokens on Joule Finance',
   inputSchema: z.object({
-    amount: z.number().describe('Amount of tokens to lend'),
+    amount: z.number().describe('Amount of tokens to lend in Octas'),
     mint: z.string().describe('Token mint address'),
     positionId: z.string().describe('Position ID'),
     newPosition: z.boolean().default(false).describe('Whether this is a new position'),
@@ -74,7 +74,7 @@ export const withdrawJouleFinanceTool = createTool({
   id: 'withdraw-joule-finance',
   description: 'Withdraw tokens from Joule Finance',
   inputSchema: z.object({
-    amount: z.number().describe('Amount of tokens to withdraw'),
+    amount: z.number().describe('Amount of tokens to withdraw in Octas'),
     mint: z.string().describe('Token mint address'),
     positionId: z.string().describe('Position ID'),
     fungibleAsset: z.boolean().default(false).describe('Whether the token is a fungible asset'),
@@ -100,7 +100,7 @@ export const borrowJouleFinanceTool = createTool({
   id: 'borrow-joule-finance',
   description: 'Borrow tokens from Joule Finance',
   inputSchema: z.object({
-    amount: z.number().describe('Amount of tokens to borrow'),
+    amount: z.number().describe('Amount of tokens to borrow in Octas'),
     mint: z.string().describe('Token mint address'),
     positionId: z.string().describe('Position ID'),
     fungibleAsset: z.boolean().default(false).describe('Whether the token is a fungible asset'),
@@ -126,7 +126,7 @@ export const repayJouleFinanceTool = createTool({
   id: 'repay-joule-finance',
   description: 'Repay borrowed tokens to Joule Finance',
   inputSchema: z.object({
-    amount: z.number().describe('Amount of tokens to repay'),
+    amount: z.number().describe('Amount of tokens to repay in Octas'),
     mint: z.string().describe('Token mint address'),
     positionId: z.string().describe('Position ID'),
     fungibleAsset: z.boolean().default(false).describe('Whether the token is a fungible asset'),
