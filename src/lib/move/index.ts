@@ -1,5 +1,6 @@
 import { Aptos, AptosConfig, Ed25519PrivateKey, type HexInput, Network, PrivateKey, PrivateKeyVariants } from "@aptos-labs/ts-sdk";
 import { AgentRuntime, LocalSigner } from "move-agent-kit";
+import { parseUnits } from "viem";
 
 
 export const getWalletBalance = async () => {
@@ -32,6 +33,7 @@ export const getWalletBalance = async () => {
     return {
         address: account.accountAddress.toString(),
         balance: balance.toString(),
+        octasBalance: parseUnits(String(balance), 8).toString(),
         network: 'MAINNET',
     };
 };

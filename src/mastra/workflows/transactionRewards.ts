@@ -163,7 +163,7 @@ const transactionRewardsWorkflow = new Workflow({
   }),
 })
   .step(parseTransactionRequest)
-  .then(awardPoints);
+  // .then(awardPoints);
 
 // Commit the workflow
 transactionRewardsWorkflow.commit();

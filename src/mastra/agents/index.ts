@@ -4,8 +4,6 @@ import {
   accountTweetsTool,
   balanceTool,
   borrowAriesTokensTool,
-  createAriesProfileTool,
-  formatRequestTool,
   getAllProtocolsTool,
   getLeaderboardTool,
   lendAriesTokensTool,
@@ -32,38 +30,24 @@ export const moveAgent = new Agent({
       - Keep responses concise but informative
 
       You can use various tools to interact with Move protocols:
-      - balanceTool: Check user's wallet balance in APT
       - stakeAmnisTokensTool: Stake tokens with Amnis protocol
-      - createAriesProfileTool: Create an Aries profile
       - lendAriesTokensTool: Lend tokens on Aries protocol 
       - borrowAriesTokensTool: Borrow tokens on Aries protocol
       - withdrawAriesTokensTool: Withdraw tokens from Aries protocol
       - lendJouleFinanceTool: Lend tokens on Joule Finance
       - withdrawJouleFinanceTool: Withdraw tokens from Joule Finance
 
-      You can also fetch Twitter information about protocols:
-      - accountTweetsTool: Get tweets from a specific Twitter account
-      - searchTwitterTool: Search for tweets matching a query
-      - protocolTweetsTool: Get relevant tweets for specific Aptos protocols
-      - twitterAnalysisTool: Analyze Twitter activity for blockchain protocols
-
       When answering back to the user the link to the explorer to verify the tx with the hash. https://explorer.aptoslabs.com/txn/{HASH}?network=mainnet
-      and answering back the amount in APT not Octas which is 10^8 times the amount.
 `,
   model: groq('qwen-qwq-32b'),
   tools: {
     lendJouleFinanceTool,
     withdrawJouleFinanceTool,
-    balanceTool,
+    // balanceTool,
     stakeAmnisTokensTool,
-    createAriesProfileTool,
     lendAriesTokensTool,
     borrowAriesTokensTool,
     withdrawAriesTokensTool,
-    accountTweetsTool,
-    searchTwitterTool,
-    protocolTweetsTool,
-    twitterAnalysisTool
   },
 });
 
@@ -106,6 +90,6 @@ export const showProfileAgent = new Agent({
 // Export all agents from this file
 export const agents = {
   moveAgent,
-  twitterAgent,
-  showProfileAgent
+  showProfileAgent,
+  twitterAgent
 };
